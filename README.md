@@ -27,8 +27,9 @@ Create `.env.local` from `.env.example` and fill in:
 ```bash
 SITE_URL=http://localhost:3000
 PAYSTACK_SECRET_KEY=sk_test_your_paystack_secret_key
-PAYSTACK_CURRENCY=USD
-NEXT_PUBLIC_SITE_CURRENCY=USD
+PAYSTACK_CURRENCY=NGN
+NEXT_PUBLIC_SITE_CURRENCY=NGN
+USD_TO_NGN_RATE=1500
 RESEND_API_KEY=re_your_resend_api_key
 RESEND_FROM_EMAIL=PeekBooks <submissions@yourdomain.com>
 EDITOR_NOTIFICATION_EMAIL=editor@yourdomain.com
@@ -53,7 +54,8 @@ Notes:
 
 - This implementation uses the Paystack secret key on the server only.
 - There is no separate Paystack webhook secret in this setup. The webhook signature is validated with `PAYSTACK_SECRET_KEY`.
-- If your Paystack account is not enabled for `USD`, change `PAYSTACK_CURRENCY` and `NEXT_PUBLIC_SITE_CURRENCY` together.
+- Pricing is authored in USD. If you are charging in `NGN`, set both `PAYSTACK_CURRENCY` and `NEXT_PUBLIC_SITE_CURRENCY` to `NGN`, then set `USD_TO_NGN_RATE` to your preferred conversion rate such as `1500`.
+- If you later enable USD on Paystack, switch both `PAYSTACK_CURRENCY` and `NEXT_PUBLIC_SITE_CURRENCY` to `USD`. No pricing code change is needed.
 
 ## Resend setup
 

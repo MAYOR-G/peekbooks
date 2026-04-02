@@ -1,5 +1,7 @@
 export const SITE_CURRENCY =
   process.env.NEXT_PUBLIC_SITE_CURRENCY?.toUpperCase() ?? "USD";
+export const BASE_PRICING_CURRENCY = "USD";
+export const USD_TO_NGN_RATE = Number(process.env.USD_TO_NGN_RATE ?? "1500");
 
 export const MINIMUM_ORDER_VALUE = 15;
 export const MAX_MANUSCRIPT_SIZE_BYTES = 10 * 1024 * 1024;
@@ -103,16 +105,22 @@ export function calculateQuote({
     throw new Error("Invalid service or turnaround selection.");
   }
 
-  const baseAmount = wordCount * service.ratePerWord;
-  const multipliedAmount = baseAmount * turnaround.multiplier;
-  const amount = Math.max(MINIMUM_ORDER_VALUE, roundCurrency(multipliedAmount));
+  const baseAmountUsd = wordCount * service.ratePerWord;
+  const multipliedAmountUsd = baseAmountUsd * turnaround.multiplier;
+  const minimumOrderValue = convertUsdAmount(MINIMUM_ORDER_VALUE, SITE_CURRENCY);
+  const amount = Math.max(
+    minimumOrderValue,
+    roundCurrency(convertUsdAmount(multipliedAmountUsd, SITE_CURRENCY)),
+  );
 
   return {
     amount,
-    baseAmount: roundCurrency(baseAmount),
+    baseAmount: roundCurrency(convertUsdAmount(baseAmountUsd, SITE_CURRENCY)),
     service,
     turnaround,
-    minimumApplied: amount === MINIMUM_ORDER_VALUE && multipliedAmount < MINIMUM_ORDER_VALUE,
+    minimumApplied:
+      amount === minimumOrderValue &&
+      convertUsdAmount(multipliedAmountUsd, SITE_CURRENCY) < minimumOrderValue,
   };
 }
 
@@ -148,4 +156,15 @@ export function countWordsFromText(text: string) {
 
 function roundCurrency(amount: number) {
   return Math.round(amount * 100) / 100;
+}
+
+function convertUsdAmount(amount: number, currency: string) {
+  switch (currency) {
+    case "USD":
+      return amount;
+    case "NGN":
+      return amount * USD_TO_NGN_RATE;
+    default:
+      return amount;
+  }
 }
