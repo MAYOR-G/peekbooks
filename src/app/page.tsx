@@ -4,9 +4,8 @@ import { motion, Variants, useInView, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
   CheckCircle2, ShieldCheck, Clock, Award, UploadCloud, FileEdit,
-  Microscope, Code, Globe2, BookOpen, Quote, Fingerprint, Activity,
-  Briefcase, Mountain, Cpu, Lightbulb, Hexagon, Compass, Stars, FlaskConical,
-  Scale, Megaphone, Presentation, FileText, Landmark
+  Microscope, Globe2, BookOpen, Quote, Fingerprint, Activity,
+  Mountain, Cpu, Lightbulb, Hexagon, Compass, ArrowUpRight
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,6 +16,7 @@ import { Container } from "@/components/layouts/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { EDITOR_FIELDS } from "@/lib/editor-fields";
 import { cn } from "@/lib/utils";
 
 const staggerContainer: Variants = {
@@ -57,27 +57,6 @@ const HERO_IMAGES = [
   "/editor-1.png",
   "/editor-2.png",
   "/editor-3.png"
-];
-
-// Expanded list of fields
-const EXPERT_FIELDS = [
-  { icon: Stars, name: "Astrophysics" },
-  { icon: FileText, name: "APA Reference Check" },
-  { icon: FlaskConical, name: "Biology" },
-  { icon: Microscope, name: "Chemistry" },
-  { icon: Code, name: "Computing" },
-  { icon: Presentation, name: "CV & Resume" },
-  { icon: Briefcase, name: "Economics" },
-  { icon: Cpu, name: "Electrical Engineering" },
-  { icon: Scale, name: "Law" },
-  { icon: Globe2, name: "Life Science" },
-  { icon: Megaphone, name: "Marketing" },
-  { icon: FileText, name: "MLA Reference Check" },
-  { icon: Activity, name: "Pharmaceutical" },
-  { icon: BookOpen, name: "Philosophy" },
-  { icon: Landmark, name: "Political Science" },
-  { icon: Fingerprint, name: "Psychology" },
-  { icon: Mountain, name: "Theology" },
 ];
 
 export default function Home() {
@@ -404,36 +383,92 @@ export default function Home() {
           </Container>
         </section>
 
-        {/* 6. Expert editors from your field (Vastly Expanded Grid) */}
-        <section className="bg-primary text-white py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.1] mix-blend-overlay"></div>
-          <div className="absolute right-0 top-0 w-1/2 h-full bg-linear-to-l from-white/10 to-transparent skew-x-12 transform translate-x-20 pointer-events-none"></div>
+        {/* 6. Expert editors from your field */}
+        <section className="relative overflow-hidden bg-[#163278] py-24 text-white">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_45%)]" />
+          <div className="absolute inset-y-0 right-0 w-[38%] bg-linear-to-l from-white/8 to-transparent pointer-events-none" />
 
-          <Container className="relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ type: "spring" }}
-              className="text-center space-y-4 mb-16 max-w-3xl mx-auto"
-            >
-              <h2 className="text-4xl sm:text-5xl font-bold font-serif tracking-tight text-white mb-4 leading-tight">Expert editors from your field</h2>
-              <p className="text-primary-foreground/80 leading-relaxed text-lg sm:text-xl">
-                Our experts are matched strictly to their academic disciplines. Your text will be edited by a published expert who speaks your discipline&apos;s language.
-              </p>
-            </motion.div>
+          <Container className="relative z-10 space-y-12">
+            <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="max-w-3xl space-y-5"
+              >
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Discipline-based matching
+                </div>
+                <h2 className="text-4xl sm:text-5xl font-bold font-serif tracking-tight text-white leading-[1.08]">
+                  Expert editors from your field
+                </h2>
+                <p className="max-w-2xl text-lg sm:text-xl leading-relaxed text-white/78">
+                  Our experts are matched strictly to their academic disciplines. Your text will be edited by a published expert who speaks your discipline&apos;s language.
+                </p>
+              </motion.div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-              {EXPERT_FIELDS.map((field, i) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: i * 0.05, type: "spring" }}
-                  key={field.name}
-                  className="group flex flex-col justify-center items-center gap-3 bg-white/5 border border-white/10 p-5 rounded-xl backdrop-blur-xl hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1 text-center"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.08, duration: 0.5, ease: "easeOut" }}
+                className="grid gap-4 sm:grid-cols-3"
+              >
+                {[
+                  { value: `${EDITOR_FIELDS.length}+`, label: "specialisms covered" },
+                  { value: "2-stage", label: "quality review" },
+                  { value: "Human", label: "editor assignment" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-[22px] border border-white/12 bg-white/7 px-5 py-5 backdrop-blur-sm"
+                  >
+                    <div className="text-2xl font-semibold font-serif text-white">{item.value}</div>
+                    <div className="mt-1 text-xs uppercase tracking-[0.16em] text-white/65">{item.label}</div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+
+            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-5 sm:p-7 backdrop-blur-sm shadow-[0_30px_90px_-55px_rgba(0,0,0,0.55)]">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+                {EDITOR_FIELDS.map((field, i) => (
+                  <motion.div
+                    key={field.name}
+                    initial={{ opacity: 0, y: 18 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ delay: i * 0.03, duration: 0.35, ease: "easeOut" }}
+                    className="group rounded-[22px] border border-white/10 bg-white/[0.05] px-4 py-5 text-center transition-all duration-250 hover:border-white/22 hover:bg-white/[0.09] hover:-translate-y-0.5"
+                  >
+                    <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-white/6 text-white/88 transition-colors duration-250 group-hover:bg-white/10 group-hover:text-white">
+                      <field.icon size={22} strokeWidth={1.6} />
+                    </div>
+                    <div className="mt-4 text-sm font-semibold leading-5 text-white/92">
+                      {field.name}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <p className="max-w-2xl text-sm leading-6 text-white/68">
+                  Matching is handled with subject sensitivity so technical meaning, tone, and context are preserved more accurately across different manuscript types.
+                </p>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="border-white/18 bg-white/8 text-white hover:bg-white/14 hover:border-white/24"
                 >
-                  <field.icon size={24} className="text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" strokeWidth={1.5} />
-                  <span className="font-semibold text-[13px] leading-tight flex-1 flex items-center justify-center">{field.name}</span>
-                </motion.div>
-              ))}
+                  <Link href="/editors">
+                    Meet Our Editors
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </Container>
         </section>

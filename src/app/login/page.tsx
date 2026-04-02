@@ -2,16 +2,26 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, BookOpenText } from "lucide-react";
 
 export default function LoginPage() {
     return (
         <main className="min-h-screen w-full flex items-center justify-center p-4 bg-muted/30">
 
             <div className="w-full max-w-md space-y-8">
-                <div className="text-center">
-                    <Link href="/" className="text-2xl font-bold tracking-tight text-foreground hover:opacity-80 transition-opacity">
-                        PEEKBOOKS
+                <div className="flex justify-center">
+                    <Link href="/" className="flex items-center gap-2.5 group">
+                        <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
+                            <BookOpenText size={22} className="text-white" strokeWidth={2} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xl font-extrabold tracking-[0.04em] text-foreground leading-none">
+                                PEEK<span className="text-primary">BOOKS</span>
+                            </span>
+                            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground leading-none mt-[3px]">
+                                Proofreading
+                            </span>
+                        </div>
                     </Link>
                 </div>
 

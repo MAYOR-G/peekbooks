@@ -3,25 +3,41 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, BookOpenText, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layouts/container";
 import { cn } from "@/lib/utils";
 
-const NAV_LINKS = [
+type NavLink = {
+    name: string;
+    path: string;
+    items?: { name: string; path: string }[];
+};
+
+const NAV_LINKS: NavLink[] = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "Services", path: "/services" },
+    {
+        name: "Services",
+        path: "/services",
+        items: [
+            { name: "Academic & Non-Academic Editing", path: "/services/editing" },
+            { name: "Express Services", path: "/services/additional#express" },
+            { name: "Manuscript Formatting", path: "/services/additional#formatting" },
+            { name: "Translation", path: "/services/additional#translation" }
+        ]
+    },
     { name: "Pricing", path: "/pricing" },
     { name: "Editors", path: "/editors" },
-    { name: "Login", path: "/login" },
 ];
 
 export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+    const [expandedMobileMenus, setExpandedMobileMenus] = useState<Record<string, boolean>>({});
     const pathname = usePathname();
 
     useEffect(() => {
@@ -44,6 +60,10 @@ export function Navbar() {
         };
     }, [mobileMenuOpen]);
 
+    const toggleMobileMenu = (name: string) => {
+        setExpandedMobileMenus(prev => ({ ...prev, [name]: !prev[name] }));
+    };
+
     return (
         <>
             <header
@@ -58,27 +78,54 @@ export function Navbar() {
                     {/* Logo */}
                     <Link
                         href="/"
-                        className="text-xl font-bold tracking-tight text-foreground"
+                        className="flex items-center gap-2.5 group"
                     >
-                        PEEKBOOKS
+                        <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                            <BookOpenText size={20} className="text-white" strokeWidth={2} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[1.15rem] font-extrabold tracking-[0.04em] text-foreground leading-none">
+                                PEEK<span className="text-primary">BOOKS</span>
+                            </span>
+                            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground leading-none mt-[3px]">
+                                Proofreading
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-8">
                         <ul className="flex items-center gap-6">
                             {NAV_LINKS.map((link) => {
-                                const isActive = pathname === link.path;
+                                const isActive = pathname === link.path || pathname.startsWith(link.path + '/');
+                                const hasDropdown = !!link.items;
+                                const isHovered = hoveredLink === link.name;
+
                                 return (
-                                    <li key={link.name}>
+                                    <li
+                                        key={link.name}
+                                        className="relative"
+                                        onMouseEnter={() => setHoveredLink(link.name)}
+                                        onMouseLeave={() => setHoveredLink(null)}
+                                    >
                                         <Link
-                                            href={link.path}
+                                            href={hasDropdown ? "#" : link.path}
                                             className={cn(
-                                                "relative text-sm font-medium transition-colors hover:text-foreground outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-1 py-0.5",
+                                                "relative flex items-center gap-1 text-sm font-medium transition-colors hover:text-foreground outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-1 py-1",
                                                 isActive ? "text-foreground" : "text-muted-foreground"
                                             )}
                                         >
                                             {link.name}
-                                            {isActive && (
+                                            {hasDropdown && (
+                                                <ChevronDown
+                                                    size={14}
+                                                    className={cn(
+                                                        "transition-transform duration-200",
+                                                        isHovered ? "rotate-180" : "rotate-0"
+                                                    )}
+                                                />
+                                            )}
+                                            {isActive && !hasDropdown && (
                                                 <motion.div
                                                     layoutId="navbar-indicator"
                                                     className="absolute -bottom-1 left-0 right-0 h-0.5 bg-foreground"
@@ -86,6 +133,35 @@ export function Navbar() {
                                                 />
                                             )}
                                         </Link>
+
+                                        {/* Dropdown Menu */}
+                                        {hasDropdown && (
+                                            <AnimatePresence>
+                                                {isHovered && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                                        className="absolute top-full left-0 mt-2 w-64 bg-card rounded-xl shadow-xl border border-border overflow-hidden z-50 origin-top-left py-2"
+                                                    >
+                                                        <ul className="flex flex-col">
+                                                            {link.items?.map((item, idx) => (
+                                                                <li key={idx}>
+                                                                    <Link
+                                                                        href={item.path}
+                                                                        className="block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-slate-50 transition-colors"
+                                                                        onClick={() => setHoveredLink(null)}
+                                                                    >
+                                                                        {item.name}
+                                                                    </Link>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        )}
                                     </li>
                                 );
                             })}
@@ -122,29 +198,81 @@ export function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm bg-card border-l border-border shadow-xl flex flex-col pt-24 pb-8 px-6"
+                            className="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm bg-card border-l border-border shadow-xl flex flex-col pt-24 pb-8 px-6 overflow-y-auto"
                         >
                             <nav className="flex-1 flex flex-col gap-6">
                                 <ul className="flex flex-col gap-4">
-                                    {NAV_LINKS.map((link) => (
-                                        <li key={link.name}>
-                                            <Link
-                                                href={link.path}
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                className={cn(
-                                                    "block text-lg font-medium transition-colors hover:text-foreground",
-                                                    pathname === link.path
-                                                        ? "text-foreground"
-                                                        : "text-muted-foreground"
+                                    {NAV_LINKS.map((link) => {
+                                        const hasDropdown = !!link.items;
+                                        const isExpanded = expandedMobileMenus[link.name];
+
+                                        return (
+                                            <li key={link.name} className="flex flex-col gap-2">
+                                                {hasDropdown ? (
+                                                    <button
+                                                        className={cn(
+                                                            "flex items-center justify-between text-lg font-medium transition-colors w-full text-left",
+                                                            pathname.startsWith(link.path) || isExpanded
+                                                                ? "text-foreground"
+                                                                : "text-muted-foreground"
+                                                        )}
+                                                        onClick={() => toggleMobileMenu(link.name)}
+                                                    >
+                                                        {link.name}
+                                                        <ChevronDown
+                                                            size={20}
+                                                            className={cn(
+                                                                "transition-transform duration-200",
+                                                                isExpanded ? "rotate-180" : "rotate-0"
+                                                            )}
+                                                        />
+                                                    </button>
+                                                ) : (
+                                                    <Link
+                                                        href={link.path}
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className={cn(
+                                                            "block text-lg font-medium transition-colors hover:text-foreground",
+                                                            pathname === link.path
+                                                                ? "text-foreground"
+                                                                : "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {link.name}
+                                                    </Link>
                                                 )}
-                                            >
-                                                {link.name}
-                                            </Link>
-                                        </li>
-                                    ))}
+
+                                                {/* Mobile Submenu */}
+                                                <AnimatePresence>
+                                                    {hasDropdown && isExpanded && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: "auto", opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            className="overflow-hidden"
+                                                        >
+                                                            <ul className="flex flex-col gap-3 pl-4 pt-2 border-l border-border/50 ml-1">
+                                                                {link.items?.map((item, idx) => (
+                                                                    <li key={idx}>
+                                                                        <Link
+                                                                            href={item.path}
+                                                                            onClick={() => setMobileMenuOpen(false)}
+                                                                            className="block text-base font-medium text-muted-foreground hover:text-foreground"
+                                                                        >
+                                                                            {item.name}
+                                                                        </Link>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
 
-                                <span className="h-px w-full bg-border" />
+                                <span className="h-px w-full bg-border mt-auto mb-4" />
 
                                 <div className="flex flex-col gap-3">
                                     <Button asChild size="lg" className="w-full">

@@ -34,6 +34,8 @@
 
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive: var(--destructive);
+  --color-success-foreground: var(--success-foreground);
+  --color-success: var(--success);
 
   --color-border: var(--border);
   --color-border-hover: var(--border-hover);
@@ -127,6 +129,8 @@
   --destructive: #dc2626;
   /* red-600 */
   --destructive-foreground: #ffffff;
+  --success: #0f766e;
+  --success-foreground: #ffffff;
 
   --border: #e2e6f0;
   --border-hover: #cbd5e1;
@@ -176,6 +180,8 @@
 
   --destructive: #991b1b;
   --destructive-foreground: #f8fafc;
+  --success: #10b981;
+  --success-foreground: #022c22;
 
   --border: #1e293b;
   --border-hover: #334155;
@@ -201,22 +207,11 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
-}
 
-/* Glassmorphism Classes */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  ::selection {
+    @apply bg-primary text-primary-foreground;
+  }
 }
-
-.dark .glass {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* End line */
 
 /* Marquee Animation */
 .pause-on-hover:hover {
