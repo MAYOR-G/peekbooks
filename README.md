@@ -32,6 +32,7 @@ NEXT_PUBLIC_SITE_CURRENCY=USD
 RESEND_API_KEY=re_your_resend_api_key
 RESEND_FROM_EMAIL=PeekBooks <submissions@yourdomain.com>
 EDITOR_NOTIFICATION_EMAIL=editor@yourdomain.com
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_your_blob_token
 ```
 
 Optional:
@@ -77,4 +78,9 @@ Legacy `.doc` files should be resaved as `.docx` before submission. This is inte
 
 ## Storage note
 
-Submitted manuscripts and submission records are stored on the server filesystem under `storage/` by default. For self-hosted Node deployments this is fine. For serverless deployments, point `SUBMISSION_STORAGE_DIR` to persistent storage or replace the storage adapter with object storage.
+Submitted manuscripts and submission records now support two storage modes:
+
+- `BLOB_READ_WRITE_TOKEN` set: manuscripts and submission records are stored in Vercel Blob with private access. This is the recommended production setup for Vercel/serverless deployments.
+- `BLOB_READ_WRITE_TOKEN` not set: the app falls back to the local server filesystem under `storage/`. This is suitable for local development or self-hosted Node deployments with persistent disk.
+
+If you deploy on Vercel or another serverless platform, configure `BLOB_READ_WRITE_TOKEN` and do not rely on `/tmp` or local disk for manuscript storage.

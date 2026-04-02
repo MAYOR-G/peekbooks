@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@next/swc-linux-x64-gnu": "16.1.6",
+    "@vercel/blob": "^2.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.3",

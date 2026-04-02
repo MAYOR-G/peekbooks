@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       submissionId,
       fileName: file.name,
       buffer,
+      mimeType: analysis.mimeType,
     });
 
     const draftRecord: SubmissionRecord = {
@@ -47,6 +48,8 @@ export async function POST(request: Request) {
         originalFileName: file.name,
         storedFileName: persistedFile.storedFileName,
         storagePath: persistedFile.storagePath,
+        storageProvider: persistedFile.storageProvider,
+        storageUrl: persistedFile.storageUrl,
         extension: analysis.extension,
         mimeType: analysis.mimeType,
         sizeBytes: analysis.sizeBytes,

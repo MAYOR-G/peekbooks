@@ -16,6 +16,8 @@ export interface SubmissionRecord {
     originalFileName: string;
     storedFileName: string;
     storagePath: string;
+    storageProvider: "filesystem" | "blob";
+    storageUrl: string | null;
     extension: string;
     mimeType: string;
     sizeBytes: number;
