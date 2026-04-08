@@ -561,21 +561,27 @@ export default function Home() {
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5 }}>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Do you write or ghostwrite content?</AccordionTrigger>
+                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">How exactly is the word count calculated?</AccordionTrigger>
                 <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  No. PEEKBOOKS does not write, ghostwrite, or generate content; it refines language and preserves authorship. We uphold strict editorial ethics.
+                  Your word count is based on the full content of your manuscript as shown in your document editor (e.g., Microsoft Word). Unless otherwise specified, all visible text is included to ensure accurate pricing.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Will I see the changes you made?</AccordionTrigger>
+                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Are there any minimum fees?</AccordionTrigger>
                 <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  Yes. Every completed job is returned with a &quot;Tracked Changes&quot; document so you have complete transparency over exactly what modifications were suggested.
+                  No, we do not charge any minimum fees. You only pay for the exact word count of your document, ensuring fair and transparent pricing regardless of length.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-3" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Is my document kept confidential?</AccordionTrigger>
+                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">When and how do I pay?</AccordionTrigger>
                 <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  Absolutely. We handle all manuscripts under strict confidentiality and ethical editing boundaries.
+                  Once you submit your manuscript, you&apos;ll receive a quote and payment instructions. Editing begins after payment is confirmed, ensuring timely delivery of your work.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
+                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Does the price include Reference Formatting?</AccordionTrigger>
+                <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
+                  Our standard pricing covers light reference formatting. If your document requires extensive citation corrections or formatting in a specific style (APA, MLA, Chicago, etc.), this may be offered as an add-on service.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

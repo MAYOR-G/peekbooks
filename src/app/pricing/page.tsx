@@ -13,7 +13,6 @@ import {
     FileText,
     GraduationCap,
     Languages,
-    HelpCircle,
     ShieldCheck,
     Clock,
     Zap
@@ -57,10 +56,7 @@ export default function PricingPage() {
     const [service, setService] = useState(SERVICES[1]); // Default to Editing
     const [turnaround, setTurnaround] = useState(TURNAROUNDS[0]);
 
-    // Minimum order value logic (e.g., $15 minimum)
-    const rawEstimatedPrice = words * service.basePrice * turnaround.multiplier;
-    const estimatedPrice = Math.max(15, rawEstimatedPrice);
-    const isMinimumPrice = rawEstimatedPrice > 0 && rawEstimatedPrice < 15;
+    const estimatedPrice = words * service.basePrice * turnaround.multiplier;
 
     return (
         <>
@@ -161,7 +157,7 @@ export default function PricingPage() {
                                             <div className="relative">
                                                 <Input
                                                     type="number"
-                                                    min={100}
+                                                    min={0}
                                                     step={100}
                                                     value={words || ''}
                                                     onChange={(e) => setWords(Number(e.target.value) || 0)}
@@ -231,15 +227,9 @@ export default function PricingPage() {
                                                         </motion.div>
                                                     </AnimatePresence>
 
-                                                    {isMinimumPrice ? (
-                                                        <span className="text-xs text-amber-600 dark:text-amber-500 font-medium mt-2 flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 w-max px-2 py-1 rounded-md">
-                                                            <HelpCircle size={12} /> Applies minimum order value of $15.00
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-xs text-muted-foreground font-medium mt-2">
-                                                            Based on ${service.basePrice.toFixed(3)}/word {turnaround.multiplier > 1 ? `x ${turnaround.multiplier} speed` : ''}
-                                                        </span>
-                                                    )}
+                                                    <span className="text-xs text-muted-foreground font-medium mt-2">
+                                                        Based on ${service.basePrice.toFixed(3)}/word {turnaround.multiplier > 1 ? `x ${turnaround.multiplier} speed` : ''}
+                                                    </span>
                                                 </div>
                                             </div>
 
@@ -358,25 +348,25 @@ export default function PricingPage() {
                                 <AccordionItem value="item-1">
                                     <AccordionTrigger className="text-left font-bold text-lg">How exactly is the word count calculated?</AccordionTrigger>
                                     <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2">
-                                        We calculate pricing based strictly on the word count of the exact text you want edited. We use Microsoft Word&apos;s built-in word count tool. You can instruct us to exclude reference lists, bibliographies, or specific appendices to save on costs.
+                                        Your word count is based on the full content of your manuscript as shown in your document editor (e.g., Microsoft Word). Unless otherwise specified, all visible text is included to ensure accurate pricing.
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-2">
                                     <AccordionTrigger className="text-left font-bold text-lg">Are there any minimum fees?</AccordionTrigger>
                                     <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2">
-                                        Yes, to cover the administrative and processing overhead of assigning an expert editor, we apply a minimum order value of $15.00 USD across all services, regardless of how short the document is.
+                                        No, we do not charge any minimum fees. You only pay for the exact word count of your document, ensuring fair and transparent pricing regardless of length.
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-3">
                                     <AccordionTrigger className="text-left font-bold text-lg">When and how do I pay?</AccordionTrigger>
                                     <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2">
-                                        Once you upload your manuscript, the system detects the word count and calculates your price immediately. Payment is completed securely through Paystack before editorial work begins, and we do not store your card details.
+                                        Once you submit your manuscript, you&apos;ll receive a quote and payment instructions. Editing begins after payment is confirmed, ensuring timely delivery of your work.
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-4">
                                     <AccordionTrigger className="text-left font-bold text-lg">Does the price include Reference Formatting?</AccordionTrigger>
                                     <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2">
-                                        Basic consistency is covered, but strict adherence to specific style guides (like APA 7th, MLA, Chicago) requires our dedicated <strong>Manuscript Formatting</strong> add-on, which can be selected during the submission process for a flat additional fee.
+                                        Our standard pricing covers light reference formatting. If your document requires extensive citation corrections or formatting in a specific style (APA, MLA, Chicago, etc.), this may be offered as an add-on service.
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>

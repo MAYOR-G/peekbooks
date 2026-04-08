@@ -878,12 +878,6 @@ export function SubmitForm() {
               }
               emphasized
             />
-
-            {quote?.minimumApplied ? (
-              <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-                A minimum order value of {formatCurrency(15, analysis?.currency)} is applied to very short manuscripts.
-              </p>
-            ) : null}
           </CardContent>
         </Card>
 

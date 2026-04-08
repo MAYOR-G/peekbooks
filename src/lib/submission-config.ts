@@ -3,7 +3,6 @@ export const SITE_CURRENCY =
 export const BASE_PRICING_CURRENCY = "USD";
 export const USD_TO_NGN_RATE = Number(process.env.USD_TO_NGN_RATE ?? "1500");
 
-export const MINIMUM_ORDER_VALUE = 15;
 export const MAX_MANUSCRIPT_SIZE_BYTES = 10 * 1024 * 1024;
 
 export const SUPPORTED_MANUSCRIPT_EXTENSIONS = ["docx", "txt"] as const;
@@ -107,10 +106,8 @@ export function calculateQuote({
 
   const baseAmountUsd = wordCount * service.ratePerWord;
   const multipliedAmountUsd = baseAmountUsd * turnaround.multiplier;
-  const minimumOrderValue = convertUsdAmount(MINIMUM_ORDER_VALUE, SITE_CURRENCY);
-  const amount = Math.max(
-    minimumOrderValue,
-    roundCurrency(convertUsdAmount(multipliedAmountUsd, SITE_CURRENCY)),
+  const amount = roundCurrency(
+    convertUsdAmount(multipliedAmountUsd, SITE_CURRENCY),
   );
 
   return {
@@ -118,9 +115,7 @@ export function calculateQuote({
     baseAmount: roundCurrency(convertUsdAmount(baseAmountUsd, SITE_CURRENCY)),
     service,
     turnaround,
-    minimumApplied:
-      amount === minimumOrderValue &&
-      convertUsdAmount(multipliedAmountUsd, SITE_CURRENCY) < minimumOrderValue,
+    minimumApplied: false,
   };
 }
 
