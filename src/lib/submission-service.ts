@@ -6,6 +6,7 @@ import {
   submissionExists,
 } from "@/lib/submission-store";
 import { verifyPaystackTransaction } from "@/lib/paystack";
+import type { SubmissionRecord } from "@/lib/submission-types";
 
 export async function finalizeSubmissionFromReference(reference: string) {
   const verification = await verifyPaystackTransaction(reference);
@@ -50,33 +51,62 @@ export async function finalizeSubmissionFromReference(reference: string) {
     throw new Error("Verified payment amount does not match the manuscript quote.");
   }
 
-  record.stage = "paid";
-  record.pricing = {
-    amount: expectedQuote.amount,
-    baseAmount: expectedQuote.baseAmount,
-    currency: verification.currency,
-    minimumApplied: expectedQuote.minimumApplied,
-  };
-  record.payment = {
-    ...record.payment,
-    status: "success",
-    paidAt: verification.paid_at,
-    verifiedAt: new Date().toISOString(),
-    channel: verification.channel,
-    gatewayResponse: verification.gateway_response,
-    transactionId: String(verification.id),
-  };
-  record.updatedAt = new Date().toISOString();
+  const alreadyPaid =
+    record.stage === "paid" && record.payment.status === "success";
 
-  await saveSubmission(record);
-  await sendSubmissionNotifications(record);
+  if (!alreadyPaid) {
+    record.stage = "paid";
+    record.pricing = {
+      amount: expectedQuote.amount,
+      baseAmount: expectedQuote.baseAmount,
+      currency: verification.currency,
+      minimumApplied: expectedQuote.minimumApplied,
+    };
+    record.payment = {
+      ...record.payment,
+      status: "success",
+      paidAt: verification.paid_at,
+      verifiedAt: new Date().toISOString(),
+      channel: verification.channel,
+      gatewayResponse: verification.gateway_response,
+      transactionId: String(verification.id),
+    };
+    record.updatedAt = new Date().toISOString();
+
+    await saveSubmission(record);
+  }
+
+  const finalizedRecord = await ensureNotifications(record);
 
   return {
-    record,
+    record: finalizedRecord,
     verified: true,
     amountMatches,
     message: "Payment verified successfully.",
   };
+}
+
+async function ensureNotifications(record: SubmissionRecord) {
+  const allNotificationsSent =
+    record.notifications.customerSubmission === "sent" &&
+    record.notifications.customerPayment === "sent" &&
+    record.notifications.editor === "sent";
+
+  if (allNotificationsSent) {
+    return record;
+  }
+
+  try {
+    return await sendSubmissionNotifications(record);
+  } catch (error) {
+    record.notifications.lastError =
+      error instanceof Error
+        ? error.message
+        : "Unable to send one or more notifications.";
+    record.updatedAt = new Date().toISOString();
+    await saveSubmission(record);
+    return record;
+  }
 }
 
 function safeParseMetadata(metadata: string) {

@@ -27,8 +27,8 @@ export function Footer() {
               <span className="text-[1.15rem] font-extrabold leading-none tracking-[0.04em] text-foreground">
                 PEEK<span className="text-primary">BOOKS</span>
               </span>
-              <span className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Proofreading
+              <span className="mt-1 max-w-[11rem] text-[0.58rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground leading-tight whitespace-normal">
+                Editing and Proofreading
               </span>
             </div>
           </Link>

@@ -2,7 +2,7 @@
 
 import { AlertCircle, CheckCircle2, LoaderCircle, RefreshCcw } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,6 +31,8 @@ type VerificationState =
 
 export function SubmitComplete({ reference }: { reference: string | null }) {
   const [state, setState] = useState<VerificationState>({ status: "loading" });
+  const retryTimeoutRef = useRef<number | null>(null);
+  const attemptsRef = useRef(0);
 
   useEffect(() => {
     if (!reference) {
@@ -42,9 +44,20 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
     }
 
     void verifySubmission(reference);
-  }, [reference]);
 
-  async function verifySubmission(paymentReference: string) {
+    return () => {
+      if (retryTimeoutRef.current) {
+        window.clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, [reference, verifySubmission]);
+
+  const verifySubmission = useCallback(async (paymentReference: string) => {
+    if (retryTimeoutRef.current) {
+      window.clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+
     setState({ status: "loading" });
 
     try {
@@ -79,16 +92,32 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
         status: "success",
         payload,
       });
+      attemptsRef.current = 0;
     } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "We could not confirm your payment yet.";
+
+      const shouldRetry =
+        attemptsRef.current < 4 &&
+        (message.includes("not been completed yet") ||
+          message.includes("could not confirm") ||
+          message.includes("Payment verification did not return"));
+
+      if (shouldRetry) {
+        attemptsRef.current += 1;
+        retryTimeoutRef.current = window.setTimeout(() => {
+          void verifySubmission(paymentReference);
+        }, 3000);
+      }
+
       setState({
         status: "failed",
-        message:
-          error instanceof Error
-            ? error.message
-            : "We could not confirm your payment yet.",
+        message,
       });
     }
-  }
+  }, []);
 
   return (
     <Card className="mx-auto max-w-2xl rounded-[30px] border-border/70 bg-white shadow-[0_36px_90px_-60px_rgba(15,23,42,0.45)]">

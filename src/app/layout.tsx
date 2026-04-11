@@ -13,8 +13,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "PEEKBOOKS | Professional Proofreading and Editing",
-  description: "Professional Proofreading and Editing for Academic, Professional, and Institutional Writing. Confidential, ethical, and transparent.",
+  title: "Peak Books Editing and Proofreading",
+  description: "Peak Books Editing and Proofreading for academic, professional, and institutional writing. Confidential, ethical, and transparent.",
   icons: {
     icon: [
       { url: "/peekbooks-favicon.svg", type: "image/svg+xml" },

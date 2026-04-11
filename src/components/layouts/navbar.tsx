@@ -87,8 +87,8 @@ export function Navbar() {
                             <span className="text-[1.15rem] font-extrabold tracking-[0.04em] text-foreground leading-none">
                                 PEEK<span className="text-primary">BOOKS</span>
                             </span>
-                            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground leading-none mt-[3px]">
-                                Proofreading
+                            <span className="mt-[3px] max-w-[10.5rem] text-[0.55rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground leading-tight whitespace-normal">
+                                Editing and Proofreading
                             </span>
                         </div>
                     </Link>

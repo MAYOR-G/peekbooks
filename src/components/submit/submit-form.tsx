@@ -1053,8 +1053,13 @@ function labelForService(serviceId: FormState["serviceId"]) {
 }
 
 function labelForTurnaround(turnaroundId: FormState["turnaroundId"]) {
-  return (
-    TURNAROUND_OPTIONS.find((option) => option.id === turnaroundId)?.label ??
-    "Not selected"
+  const option = TURNAROUND_OPTIONS.find(
+    (turnaroundOption) => turnaroundOption.id === turnaroundId,
   );
+
+  if (!option) {
+    return "Not selected";
+  }
+
+  return `${option.label} (${option.days})`;
 }

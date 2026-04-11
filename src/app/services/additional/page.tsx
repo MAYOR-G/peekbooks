@@ -96,8 +96,8 @@ export default function AdditionalServicesPage() {
 
                                 <motion.ul variants={staggerContainer} className="space-y-4 mb-8">
                                     {[
-                                        "Documents under 3,000 words returned in 8 hours or less.",
-                                        "Documents up to 6,000 words returned in 24 hours or less.",
+                                        "Documents under 3,000 words returned within 7 days.",
+                                        "Documents up to 6,000 words returned within 7 days.",
                                         "Perfect for final drafts needing a strict, final polish.",
                                         "All the benefits of standard editing, at an accelerated pace."
                                     ].map((item, idx) => (
@@ -127,7 +127,7 @@ export default function AdditionalServicesPage() {
                                 <div className="aspect-square md:aspect-[4/3] flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200 p-8">
                                     <Clock className="w-24 h-24 text-orange-500/50 mb-6" strokeWidth={1} />
                                     <h3 className="text-2xl font-bold text-slate-700 mb-2">Beat the Deadline</h3>
-                                    <p className="text-slate-500 text-center max-w-xs">We guarantee return times as fast as 8 hours for critical documents.</p>
+                                    <p className="text-slate-500 text-center max-w-xs">We guarantee return times within 7 days for critical documents.</p>
                                 </div>
                             </motion.div>
                         </div>

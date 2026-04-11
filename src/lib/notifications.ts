@@ -1,6 +1,10 @@
 import { readSubmissionFile, saveSubmission } from "@/lib/submission-store";
 import type { NotificationState, SubmissionRecord } from "@/lib/submission-types";
-import { formatCurrency } from "@/lib/submission-config";
+import {
+  formatCurrency,
+  getServiceById,
+  getTurnaroundById,
+} from "@/lib/submission-config";
 
 export async function sendSubmissionNotifications(record: SubmissionRecord) {
   if (!record.customer || !record.brief || !record.pricing || !record.payment) {
@@ -228,11 +232,25 @@ function escapeHtml(value: string) {
 }
 
 function getServiceLabel(record: SubmissionRecord) {
-  return record.brief?.serviceId.replaceAll("-", " ") ?? "Unknown";
+  if (!record.brief) {
+    return "Unknown";
+  }
+
+  return getServiceById(record.brief.serviceId)?.label ?? "Unknown";
 }
 
 function getTurnaroundLabel(record: SubmissionRecord) {
-  return record.brief?.turnaroundId.replaceAll("-", " ") ?? "Unknown";
+  if (!record.brief) {
+    return "Unknown";
+  }
+
+  const turnaround = getTurnaroundById(record.brief.turnaroundId);
+
+  if (!turnaround) {
+    return "Unknown";
+  }
+
+  return `${turnaround.label} (${turnaround.days})`;
 }
 
 function formatBytes(bytes: number) {

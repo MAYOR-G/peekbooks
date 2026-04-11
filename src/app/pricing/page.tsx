@@ -33,9 +33,9 @@ const SERVICES = [
 ];
 
 const TURNAROUNDS = [
-    { id: "standard", label: "Standard", multiplier: 1, days: "5-7 days", icon: Clock },
-    { id: "priority", label: "Priority", multiplier: 1.5, days: "2-3 days", icon: Zap },
-    { id: "express", label: "Express", multiplier: 2, days: "24 hours", icon: Zap },
+    { id: "standard", label: "Standard", multiplier: 1, days: "4 weeks and above", icon: Clock },
+    { id: "priority", label: "Priority", multiplier: 1.5, days: "2 weeks", icon: Zap },
+    { id: "express", label: "Express", multiplier: 2, days: "7 days", icon: Zap },
 ];
 
 const PRESET_WORDS = [500, 2000, 5000, 10000];
