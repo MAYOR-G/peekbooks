@@ -34,24 +34,6 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
   const retryTimeoutRef = useRef<number | null>(null);
   const attemptsRef = useRef(0);
 
-  useEffect(() => {
-    if (!reference) {
-      setState({
-        status: "failed",
-        message: "Missing payment reference. Please contact the editor if you were charged.",
-      });
-      return;
-    }
-
-    void verifySubmission(reference);
-
-    return () => {
-      if (retryTimeoutRef.current) {
-        window.clearTimeout(retryTimeoutRef.current);
-      }
-    };
-  }, [reference, verifySubmission]);
-
   const verifySubmission = useCallback(async (paymentReference: string) => {
     if (retryTimeoutRef.current) {
       window.clearTimeout(retryTimeoutRef.current);
@@ -118,6 +100,24 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!reference) {
+      setState({
+        status: "failed",
+        message: "Missing payment reference. Please contact the editor if you were charged.",
+      });
+      return;
+    }
+
+    void verifySubmission(reference);
+
+    return () => {
+      if (retryTimeoutRef.current) {
+        window.clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, [reference, verifySubmission]);
 
   return (
     <Card className="mx-auto max-w-2xl rounded-[30px] border-border/70 bg-white shadow-[0_36px_90px_-60px_rgba(15,23,42,0.45)]">
