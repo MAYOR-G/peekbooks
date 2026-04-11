@@ -33,6 +33,7 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
   const [state, setState] = useState<VerificationState>({ status: "loading" });
   const retryTimeoutRef = useRef<number | null>(null);
   const attemptsRef = useRef(0);
+  const resolvedReferenceRef = useRef<string | null>(reference);
 
   const verifySubmission = useCallback(async (paymentReference: string) => {
     if (retryTimeoutRef.current) {
@@ -102,7 +103,13 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
   }, []);
 
   useEffect(() => {
-    if (!reference) {
+    const browserReference = new URLSearchParams(window.location.search).get("reference");
+    const browserTrxref = new URLSearchParams(window.location.search).get("trxref");
+    const resolvedReference = reference ?? browserReference ?? browserTrxref;
+
+    resolvedReferenceRef.current = resolvedReference;
+
+    if (!resolvedReference) {
       setState({
         status: "failed",
         message: "Missing payment reference. Please contact the editor if you were charged.",
@@ -110,7 +117,7 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
       return;
     }
 
-    void verifySubmission(reference);
+    void verifySubmission(resolvedReference);
 
     return () => {
       if (retryTimeoutRef.current) {
@@ -156,8 +163,8 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
                 type="button"
                 size="lg"
                 onClick={() => {
-                  if (reference) {
-                    void verifySubmission(reference);
+                  if (resolvedReferenceRef.current) {
+                    void verifySubmission(resolvedReferenceRef.current);
                   }
                 }}
               >
