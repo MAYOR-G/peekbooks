@@ -58,7 +58,7 @@ export async function sendSubmissionNotifications(record: SubmissionRecord) {
 
   await saveSubmission(record);
 
-  return record.notifications;
+  return record;
 }
 
 async function sendIfNeeded(
