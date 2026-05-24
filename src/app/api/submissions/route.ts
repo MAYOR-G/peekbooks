@@ -3,19 +3,33 @@ import { NextResponse } from "next/server";
 import {
   DOCUMENT_TYPE_OPTIONS,
   FORMATTING_OPTIONS,
+  LANGUAGE_STYLE_OPTIONS,
   MANUSCRIPT_SERVICES,
   SITE_CURRENCY,
+  TRANSCRIPTION_LANGUAGE_OPTIONS,
   TURNAROUND_OPTIONS,
-  calculateQuote,
+  calculateMultiServiceQuote,
 } from "@/lib/submission-config";
 import { initializePaystackTransaction } from "@/lib/paystack";
 import { readSubmission, saveSubmission } from "@/lib/submission-store";
+import { sendUnpaidSubmissionNotifications } from "@/lib/notifications";
+import {
+  PublicError,
+  assertRateLimit,
+  getClientIp,
+  jsonError,
+  sanitizeText,
+  verifyTurnstileToken,
+} from "@/lib/security";
 import type { FormattingStyleId } from "@/lib/submission-config";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    assertRateLimit(`submission:${ip}`, 4);
+
     const payload = (await request.json()) as {
       submissionId?: string;
       fullName?: string;
@@ -25,28 +39,32 @@ export async function POST(request: Request) {
       documentType?: string;
       academicField?: string;
       formattingStyle?: FormattingStyleId;
+      customFormattingInstructions?: string;
+      languageStyle?: string;
+      serviceDetails?: string;
       serviceId?: string;
+      serviceIds?: string[];
       turnaroundId?: string;
       notes?: string;
+      finalWordCount?: number;
+      wordCountAdjustmentNote?: string;
+      turnstileToken?: string;
+      company?: string;
     };
+
+    if (payload.company) {
+      return NextResponse.json({ ok: true });
+    }
+
+    await verifyTurnstileToken({ token: payload.turnstileToken, ip });
 
     const validated = validateSubmissionPayload(payload);
     const record = await readSubmission(validated.submissionId);
-    const quote = calculateQuote({
-      wordCount: record.manuscript.wordCount,
-      serviceId: validated.serviceId,
+    const finalWordCount = validated.finalWordCount;
+    const quote = calculateMultiServiceQuote({
+      wordCount: finalWordCount,
+      serviceIds: validated.serviceIds,
       turnaroundId: validated.turnaroundId,
-    });
-
-    const payment = await initializePaystackTransaction({
-      email: validated.email,
-      amount: quote.amount,
-      metadata: {
-        submissionId: record.id,
-        wordCount: record.manuscript.wordCount,
-        serviceId: validated.serviceId,
-        turnaroundId: validated.turnaroundId,
-      },
     });
 
     record.customer = {
@@ -59,7 +77,11 @@ export async function POST(request: Request) {
       documentType: validated.documentType,
       academicField: validated.academicField,
       formattingStyle: validated.formattingStyle,
+      customFormattingInstructions: validated.customFormattingInstructions,
+      languageStyle: validated.languageStyle,
+      serviceDetails: validated.serviceDetails,
       serviceId: validated.serviceId,
+      serviceIds: validated.serviceIds,
       turnaroundId: validated.turnaroundId,
       notes: validated.notes,
     };
@@ -69,39 +91,95 @@ export async function POST(request: Request) {
       baseAmount: quote.baseAmount,
       minimumApplied: quote.minimumApplied,
     };
-    record.payment = {
-      reference: payment.reference,
-      authorizationUrl: payment.authorization_url,
-      accessCode: payment.access_code,
-      status: "initialized",
-      paidAt: null,
-      verifiedAt: null,
-      channel: null,
-      gatewayResponse: null,
-      transactionId: null,
-    };
+    record.manuscript.detectedWordCount =
+      record.manuscript.detectedWordCount ?? record.manuscript.wordCount;
+    record.manuscript.finalWordCount = finalWordCount;
+    record.manuscript.wordCount = finalWordCount;
+    record.manuscript.wordCountAdjustmentNote = validated.wordCountAdjustmentNote;
+    record.payment = null;
     record.stage = "payment_pending";
+    record.paymentStatus = "unpaid";
+    record.projectStatus = "pending";
     record.updatedAt = new Date().toISOString();
 
     await saveSubmission(record);
-
-    return NextResponse.json({
-      authorizationUrl: payment.authorization_url,
-      reference: payment.reference,
-      quote: {
-        amount: quote.amount,
-        baseAmount: quote.baseAmount,
-        minimumApplied: quote.minimumApplied,
-        currency: SITE_CURRENCY,
-      },
+    await sendUnpaidSubmissionNotifications(record).catch(async (error) => {
+      record.notifications.lastError =
+        error instanceof Error ? error.message : "Unable to send submission emails.";
+      await saveSubmission(record);
     });
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "We could not start the payment process.";
 
-    return NextResponse.json({ error: message }, { status: 400 });
+    if (quote.amount <= 0 || finalWordCount > 50000) {
+      return NextResponse.json({
+        authorizationUrl: null,
+        submissionId: record.id,
+        paymentStatus: record.paymentStatus,
+        customReview: finalWordCount > 50000,
+        quote: {
+          amount: quote.amount,
+          baseAmount: quote.baseAmount,
+          minimumApplied: quote.minimumApplied,
+          currency: SITE_CURRENCY,
+        },
+      });
+    }
+
+    try {
+      const payment = await initializePaystackTransaction({
+        email: validated.email,
+        amount: quote.amount,
+        metadata: {
+          submissionId: record.id,
+          wordCount: finalWordCount,
+          serviceId: validated.serviceId,
+          serviceIds: validated.serviceIds.join(","),
+          turnaroundId: validated.turnaroundId,
+        },
+      });
+
+      record.payment = {
+        reference: payment.reference,
+        authorizationUrl: payment.authorization_url,
+        accessCode: payment.access_code,
+        status: "initialized",
+        paidAt: null,
+        verifiedAt: null,
+        channel: null,
+        gatewayResponse: null,
+        transactionId: null,
+      };
+      record.paymentStatus = "pending";
+      record.updatedAt = new Date().toISOString();
+      await saveSubmission(record);
+
+      return NextResponse.json({
+        authorizationUrl: payment.authorization_url,
+        submissionId: record.id,
+        paymentStatus: record.paymentStatus,
+        quote: {
+          amount: quote.amount,
+          baseAmount: quote.baseAmount,
+          minimumApplied: quote.minimumApplied,
+          currency: SITE_CURRENCY,
+        },
+      });
+    } catch {
+      return NextResponse.json({
+        authorizationUrl: null,
+        submissionId: record.id,
+        paymentStatus: "unpaid",
+        message:
+          "Your manuscript was saved, but payment could not be started. Our team will follow up with next steps.",
+        quote: {
+          amount: quote.amount,
+          baseAmount: quote.baseAmount,
+          minimumApplied: quote.minimumApplied,
+          currency: SITE_CURRENCY,
+        },
+      });
+    }
+  } catch (error) {
+    return jsonError(error, "We could not save the manuscript submission.");
   }
 }
 
@@ -114,9 +192,15 @@ function validateSubmissionPayload(payload: {
   documentType?: string;
   academicField?: string;
   formattingStyle?: FormattingStyleId;
+  customFormattingInstructions?: string;
+  languageStyle?: string;
+  serviceDetails?: string;
   serviceId?: string;
+  serviceIds?: string[];
   turnaroundId?: string;
   notes?: string;
+  finalWordCount?: number;
+  wordCountAdjustmentNote?: string;
 }) {
   if (!payload.submissionId) {
     throw new Error("Missing manuscript submission id.");
@@ -145,7 +229,17 @@ function validateSubmissionPayload(payload: {
     throw new Error("Please choose the required formatting style.");
   }
 
-  if (!MANUSCRIPT_SERVICES.some((service) => service.id === payload.serviceId)) {
+  const serviceIds =
+    payload.serviceIds?.length
+      ? payload.serviceIds
+      : payload.serviceId
+        ? [payload.serviceId]
+        : [];
+
+  if (
+    serviceIds.length === 0 ||
+    serviceIds.some((serviceId) => !MANUSCRIPT_SERVICES.some((service) => service.id === serviceId))
+  ) {
     throw new Error("Please select an editorial service.");
   }
 
@@ -153,17 +247,51 @@ function validateSubmissionPayload(payload: {
     throw new Error("Please choose a turnaround option.");
   }
 
+  const finalWordCount = Number(payload.finalWordCount);
+
+  if (!Number.isFinite(finalWordCount) || finalWordCount < 1 || finalWordCount > 500000) {
+    throw new PublicError("Please enter a valid final word count.");
+  }
+
+  const turnaround = TURNAROUND_OPTIONS.find((option) => option.id === payload.turnaroundId);
+
+  if (turnaround?.maxWords && finalWordCount > turnaround.maxWords && finalWordCount <= 50000) {
+    throw new PublicError("Please choose a longer turnaround for this word count.");
+  }
+
+  if (
+    payload.languageStyle &&
+    !LANGUAGE_STYLE_OPTIONS.includes(payload.languageStyle as never)
+  ) {
+    throw new Error("Please choose a valid language or style preference.");
+  }
+
+  if (
+    serviceIds.includes("transcribing") &&
+    payload.serviceDetails &&
+    !TRANSCRIPTION_LANGUAGE_OPTIONS.includes(payload.serviceDetails as never) &&
+    !payload.serviceDetails.startsWith("Other:")
+  ) {
+    throw new Error("Please choose a valid transcription language.");
+  }
+
   return {
     submissionId: payload.submissionId,
-    fullName: payload.fullName.trim(),
+    fullName: sanitizeText(payload.fullName, 120),
     email: payload.email.trim().toLowerCase(),
-    institution: payload.institution?.trim() ?? "",
-    country: payload.country?.trim() ?? "",
+    institution: sanitizeText(payload.institution ?? "", 160),
+    country: sanitizeText(payload.country ?? "", 100),
     documentType: payload.documentType,
-    academicField: payload.academicField.trim(),
+    academicField: sanitizeText(payload.academicField, 180),
     formattingStyle: payload.formattingStyle,
-    serviceId: payload.serviceId as (typeof MANUSCRIPT_SERVICES)[number]["id"],
+    customFormattingInstructions: sanitizeText(payload.customFormattingInstructions ?? "", 1000),
+    languageStyle: payload.languageStyle || "No preference",
+    serviceDetails: sanitizeText(payload.serviceDetails ?? "", 300),
+    serviceId: serviceIds[0] as (typeof MANUSCRIPT_SERVICES)[number]["id"],
+    serviceIds: serviceIds as Array<(typeof MANUSCRIPT_SERVICES)[number]["id"]>,
     turnaroundId: payload.turnaroundId as (typeof TURNAROUND_OPTIONS)[number]["id"],
-    notes: payload.notes?.trim() ?? "",
+    notes: sanitizeText(payload.notes ?? "", 4000),
+    finalWordCount: Math.round(finalWordCount),
+    wordCountAdjustmentNote: sanitizeText(payload.wordCountAdjustmentNote ?? "", 1000),
   };
 }

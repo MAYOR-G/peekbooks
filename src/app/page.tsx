@@ -54,22 +54,104 @@ const LOGOS = [
 ];
 
 const HERO_IMAGES = [
-  "/editor-1.png",
-  "/editor-2.png",
-  "/editor-3.png"
+  "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=82",
+  "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=82",
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=82"
 ];
+
+const SERVICE_IMAGE =
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=85";
+
+const SUPPORTING_SERVICE_IMAGE =
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80";
+
+const EXPERT_SECTION_IMAGE =
+  "https://images.unsplash.com/photo-1573497491208-6b1acb260507?auto=format&fit=crop&w=1200&q=82";
+
+const HERO_SERVICE_WORDS = [
+  "Proofreading",
+  "Editing",
+  "Academic editing",
+  "Non-academic editing",
+  "Scientific editing",
+  "Business editing",
+  "Formatting",
+  "Translation",
+  "Transcribing",
+  "Writing support",
+];
+
+const EXPERT_FIELD_LABELS = [
+  "Astrophysics",
+  "APA Reference Check",
+  "Biology",
+  "Chemistry",
+  "Computing",
+  "CV & Resume",
+  "Economics",
+  "Electrical Engineering",
+  "Law",
+  "Life Science",
+  "Engineering",
+  "Medicine",
+  "Nursing",
+  "Psychology",
+  "Education",
+  "Business",
+  "Marketing",
+  "Theology",
+  "Philosophy",
+  "Political Science",
+];
+
+const VISIBLE_EXPERT_CARDS = 10;
 
 export default function Home() {
   const whyRef = useRef(null);
   const isWhyInView = useInView(whyRef, { once: true, margin: "-100px" });
 
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const [currentServiceWord, setCurrentServiceWord] = useState(0);
+  const [expertFieldIndexes, setExpertFieldIndexes] = useState(
+    Array.from({ length: VISIBLE_EXPERT_CARDS }, (_, index) => index),
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentHeroImage((prev) => (prev + 1) % HERO_IMAGES.length);
     }, 4000); // Change image every 4 seconds
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentServiceWord((prev) => (prev + 1) % HERO_SERVICE_WORDS.length);
+    }, 1600);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timers = Array.from({ length: VISIBLE_EXPERT_CARDS }, (_, slot) => {
+      let interval: ReturnType<typeof setInterval> | null = null;
+      const timeout = setTimeout(() => {
+        interval = setInterval(() => {
+          setExpertFieldIndexes((previous) => {
+            const next = [...previous];
+            next[slot] = (next[slot] + 7 + slot) % EXPERT_FIELD_LABELS.length;
+            return next;
+          });
+        }, 2100 + slot * 90);
+      }, slot * 180);
+
+      return () => {
+        clearTimeout(timeout);
+        if (interval) {
+          clearInterval(interval);
+        }
+      };
+    });
+
+    return () => timers.forEach((cleanup) => cleanup());
   }, []);
 
   return (
@@ -101,10 +183,10 @@ export default function Home() {
               className="flex flex-col gap-6 max-w-2xl"
             >
               <motion.h1 variants={fadeUpVariant} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-primary font-serif leading-[1.15]">
-                Professional proofreading & editing by award-winning experts.
+                Professional proofreading, editing, and formatting for serious writing.
               </motion.h1>
               <motion.p variants={fadeUpVariant} className="text-lg text-foreground/80 leading-relaxed max-w-xl">
-                Need proofreading, editing, or translation? Join thousands of researchers who trust PEEKBOOKS. Our team of experts is available 24/7.
+                Peekbooks Editing and Proofreading helps researchers, authors, and professionals refine documents with human editorial care, clean formatting, and confidential handling.
               </motion.p>
               <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button size="lg" asChild className="text-base h-14 px-8 shadow-lg hover:shadow-xl transition-all shadow-primary/20">
@@ -113,6 +195,26 @@ export default function Home() {
                 <Button size="lg" variant="outline" asChild className="text-base h-14 px-8 border-primary/20 hover:bg-primary/5">
                   <Link href="/pricing" className="text-primary">View Pricing</Link>
                 </Button>
+              </motion.div>
+              <motion.div
+                variants={fadeUpVariant}
+                className="mt-1 flex flex-wrap items-center gap-3 rounded-2xl border border-primary/10 bg-white/78 px-4 py-3 shadow-sm backdrop-blur-sm"
+              >
+                <span className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Experts on
+                </span>
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={HERO_SERVICE_WORDS[currentServiceWord]}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.22 }}
+                    className="font-serif text-xl font-semibold text-primary"
+                  >
+                    {HERO_SERVICE_WORDS[currentServiceWord]}
+                  </motion.span>
+                </AnimatePresence>
               </motion.div>
             </motion.div>
 
@@ -136,7 +238,7 @@ export default function Home() {
                 >
                   <Image
                     src={HERO_IMAGES[currentHeroImage]}
-                    alt="Expert Editor at Work"
+                    alt="Professional editor reviewing manuscript"
                     fill
                     className="object-cover"
                     priority
@@ -147,8 +249,8 @@ export default function Home() {
               <div className="absolute inset-0 bg-linear-to-t from-primary/60 via-transparent to-transparent z-10" />
               <div className="absolute bottom-6 left-6 right-6 z-20 flex justify-between items-end">
                 <div className="text-white">
-                  <p className="font-bold text-lg mb-1 flex items-center gap-2"><CheckCircle2 size={18} className="text-emerald-400" /> Human Editors</p>
-                  <p className="text-sm text-white/80">Every document is personally reviewed by experts.</p>
+                  <p className="font-bold text-lg mb-1 flex items-center gap-2"><CheckCircle2 size={18} className="text-emerald-400" /> Human editorial review</p>
+                  <p className="text-sm text-white/80">Proofreading, editing, and formatting handled with care.</p>
                 </div>
                 <div className="flex gap-2">
                   {HERO_IMAGES.map((_, i) => (
@@ -198,7 +300,7 @@ export default function Home() {
               className="text-center space-y-4"
             >
               <h2 className="text-3xl sm:text-4xl font-bold font-serif tracking-tight text-primary">Our services at a glance</h2>
-              <p className="text-lg text-foreground/70 max-w-2xl mx-auto">Providing a tailored experience with specialized disciplines to ensure your academic work shines.</p>
+              <p className="text-lg text-foreground/70 max-w-2xl mx-auto">Focused editorial services for authors who need clarity, polish, and publication-ready presentation.</p>
             </motion.div>
 
             <div className="grid lg:grid-cols-12 gap-6">
@@ -208,28 +310,53 @@ export default function Home() {
                 initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }}
                 className="lg:col-span-8 flex flex-col h-full"
               >
-                <Card className="flex flex-col lg:flex-row h-full overflow-hidden border-border/60 hover:shadow-[0_20px_40px_-15px_rgba(30,58,138,0.15)] transition-all duration-300">
-                  {/* Left big color block */}
-                  <div className="bg-primary/5 p-8 sm:p-12 lg:w-1/2 flex flex-col justify-center relative overflow-hidden">
-                    <div className="absolute -top-10 -right-10 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-                    <FileEdit size={48} className="text-primary mb-6 drop-shadow-sm" />
-                    <h3 className="text-3xl font-bold text-primary mb-4 font-serif leading-tight">Editing and Proofreading</h3>
-                    <p className="text-foreground/80 leading-relaxed mb-8 text-base">
-                      Our flagship service. Our comprehensive English editing ensures your text will satisfy the strict standards of peer review. We handle surface-level polish and deeper structural adjustments while preserving your authorship.
+                <Card className="flex flex-col lg:flex-row h-full overflow-hidden border-border/60 bg-white shadow-[0_24px_70px_-48px_rgba(15,23,42,0.45)] hover:shadow-[0_28px_80px_-45px_rgba(30,58,138,0.24)] transition-all duration-300">
+                  {/* Left side: Content */}
+                  <div className="p-8 sm:p-12 lg:w-[55%] flex flex-col justify-center bg-white relative overflow-hidden">
+                    <div className="absolute -top-10 -right-10 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                    
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="p-3 bg-primary/10 rounded-xl">
+                        <FileEdit size={32} className="text-primary" />
+                      </div>
+                      <h3 className="text-3xl font-bold text-foreground font-serif leading-tight">Proofreading, editing, and formatting</h3>
+                    </div>
+                    
+                    <p className="text-foreground/80 leading-relaxed mb-6 text-base">
+                      Our core service blends careful proofreading, sentence-level editing, and clean formatting support so your document reads clearly and looks professionally prepared without losing your voice.
                     </p>
-                    <Button className="w-fit">Start Edition Process</Button>
+
+                    <div className="mb-8">
+                      <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">Includes:</h4>
+                      <ul className="grid sm:grid-cols-2 gap-3">
+                        {["Grammar and punctuation", "Clarity and flow", "Document formatting", "Journal and style checks"].map(item => (
+                          <li key={item} className="flex items-start gap-2">
+                            <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
+                            <span className="text-sm text-muted-foreground">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <Button asChild className="w-fit shadow-md">
+                      <Link href="/submit">Start Editing Process</Link>
+                    </Button>
                   </div>
-                  {/* Additional info side */}
-                  <div className="p-8 sm:p-12 lg:w-1/2 bg-white flex flex-col justify-center">
-                    <h4 className="font-bold text-lg mb-4 text-foreground">Includes:</h4>
-                    <ul className="space-y-4">
-                      {["Punctuation, grammar, vocabulary", "Clarity and flow adjustments", "Consistency check (British vs American)", "Adherence to journal guidelines"].map(item => (
-                        <li key={item} className="flex items-start gap-3">
-                          <CheckCircle2 size={18} className="text-emerald-500 mt-0.5 shrink-0" />
-                          <span className="text-muted-foreground">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  
+                  {/* Right side: Image */}
+                  <div className="lg:w-[45%] relative min-h-[360px] lg:min-h-full">
+                    <Image 
+                      src={SERVICE_IMAGE}
+                      alt="Editor marking up a manuscript at a desk"
+                      fill 
+                      sizes="(min-width: 1024px) 35vw, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-primary/45 via-transparent to-transparent" />
+                    <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/18 bg-white/14 p-4 text-white backdrop-blur-md">
+                      <p className="text-sm font-semibold">Detailed document review</p>
+                      <p className="mt-1 text-xs leading-5 text-white/78">Tracked changes, formatting checks, and final polish.</p>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -238,7 +365,16 @@ export default function Home() {
               <div className="lg:col-span-4 flex flex-col gap-6">
                 <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} className="flex-1">
                   <Card className="h-full flex flex-col p-6 sm:p-8 hover:shadow-xl transition-all border-border/60 bg-white">
-                    <Globe2 size={32} className="text-primary mb-4" />
+                    <div className="relative mb-5 h-32 overflow-hidden rounded-2xl">
+                      <Image
+                        src={SUPPORTING_SERVICE_IMAGE}
+                        alt="Professional desk with laptop and editorial notes"
+                        fill
+                        sizes="(min-width: 1024px) 25vw, 100vw"
+                        className="object-cover"
+                      />
+                    </div>
+                    <Globe2 size={30} className="text-primary mb-4" />
                     <h3 className="text-xl font-bold text-foreground mb-3 font-serif">Translation</h3>
                     <p className="text-sm text-foreground/70 leading-relaxed max-w-sm mb-4">
                       Executed by native linguists aware of academic conventions, preserving your exact meaning and transferring it fluently into English.
@@ -249,10 +385,10 @@ export default function Home() {
 
                 <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ delay: 0.1 }} className="flex-1">
                   <Card className="h-full flex flex-col p-6 sm:p-8 hover:shadow-xl transition-all border-border/60 bg-white">
-                    <BookOpen size={32} className="text-primary mb-4" />
-                    <h3 className="text-xl font-bold text-foreground mb-3 font-serif">Formatting Check</h3>
+                    <BookOpen size={30} className="text-primary mb-4" />
+                    <h3 className="text-xl font-bold text-foreground mb-3 font-serif">Formatting</h3>
                     <p className="text-sm text-foreground/70 leading-relaxed max-w-sm mb-4">
-                      Automated and manual formatting checks to ensure compliance with specific journal requirements or specific university guidelines.
+                      Manual formatting checks for APA, MLA, Chicago, Harvard, OSCOLA, IEEE, journal-specific, and custom document requirements.
                     </p>
                     <Link href="/services" className="mt-auto text-primary font-bold text-sm hover:underline">Learn more &rarr;</Link>
                   </Card>
@@ -332,7 +468,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-4xl sm:text-5xl font-bold font-serif tracking-tight text-primary leading-tight"
               >
-                Why Authors choose <br /><span className="text-primary-hover">PEEKBOOKS</span>
+                Why Authors choose <br /><span className="text-primary-hover">Peekbooks</span>
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -384,90 +520,89 @@ export default function Home() {
         </section>
 
         {/* 6. Expert editors from your field */}
-        <section className="relative overflow-hidden bg-[#163278] py-24 text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_45%)]" />
-          <div className="absolute inset-y-0 right-0 w-[38%] bg-linear-to-l from-white/8 to-transparent pointer-events-none" />
-
-          <Container className="relative z-10 space-y-12">
-            <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="max-w-3xl space-y-5"
-              >
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Discipline-based matching
-                </div>
-                <h2 className="text-4xl sm:text-5xl font-bold font-serif tracking-tight text-white leading-[1.08]">
-                  Expert editors from your field
-                </h2>
-                <p className="max-w-2xl text-lg sm:text-xl leading-relaxed text-white/78">
-                  Our experts are matched strictly to their academic disciplines. Your text will be edited by a published expert who speaks your discipline&apos;s language.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.08, duration: 0.5, ease: "easeOut" }}
-                className="grid gap-4 sm:grid-cols-3"
-              >
-                {[
-                  { value: `${EDITOR_FIELDS.length}+`, label: "specialisms covered" },
-                  { value: "2-stage", label: "quality review" },
-                  { value: "Human", label: "editor assignment" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-[22px] border border-white/12 bg-white/7 px-5 py-5 backdrop-blur-sm"
-                  >
-                    <div className="text-2xl font-semibold font-serif text-white">{item.value}</div>
-                    <div className="mt-1 text-xs uppercase tracking-[0.16em] text-white/65">{item.label}</div>
+        <section className="relative overflow-hidden bg-[#f5f7fb] py-8 sm:py-10 lg:py-12">
+          <div className="absolute inset-x-0 top-0 h-28 bg-[#17347f]" />
+          <Container className="relative z-10 max-w-[1500px]">
+            <div className="overflow-hidden rounded-[32px] border border-border/70 bg-white shadow-[0_34px_100px_-62px_rgba(15,23,42,0.55)]">
+              <div className="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(470px,0.92fr)]">
+                <div className="relative min-h-[380px] overflow-hidden bg-primary sm:min-h-[470px] lg:min-h-[520px] xl:min-h-[540px]">
+                  <Image
+                    src={EXPERT_SECTION_IMAGE}
+                    alt="Professional editor reviewing business documents"
+                    fill
+                    sizes="(min-width: 1280px) 52vw, (min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-primary/78 via-primary/18 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6 rounded-[24px] border border-white/18 bg-white/14 p-5 text-white backdrop-blur-md">
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { value: `${EDITOR_FIELDS.length}+`, label: "Specialisms" },
+                        { value: "2-stage", label: "Quality review" },
+                        { value: "Human", label: "Editing" },
+                      ].map((item) => (
+                        <div key={item.label} className="min-w-28">
+                          <div className="font-serif text-2xl font-semibold">{item.value}</div>
+                          <div className="text-[11px] uppercase tracking-[0.16em] text-white/68">
+                            {item.label}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </motion.div>
-            </div>
+                </div>
 
-            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-5 sm:p-7 backdrop-blur-sm shadow-[0_30px_90px_-55px_rgba(0,0,0,0.55)]">
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-                {EDITOR_FIELDS.map((field, i) => (
-                  <motion.div
-                    key={field.name}
-                    initial={{ opacity: 0, y: 18 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-60px" }}
-                    transition={{ delay: i * 0.03, duration: 0.35, ease: "easeOut" }}
-                    className="group rounded-[22px] border border-white/10 bg-white/[0.05] px-4 py-5 text-center transition-all duration-250 hover:border-white/22 hover:bg-white/[0.09] hover:-translate-y-0.5"
-                  >
-                    <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-white/6 text-white/88 transition-colors duration-250 group-hover:bg-white/10 group-hover:text-white">
-                      <field.icon size={22} strokeWidth={1.6} />
+                <div className="p-5 sm:p-8 lg:p-9 xl:p-10">
+                  <div className="max-w-3xl space-y-4">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Discipline-based matching
                     </div>
-                    <div className="mt-4 text-sm font-semibold leading-5 text-white/92">
-                      {field.name}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                    <h2 className="font-serif text-3xl font-semibold tracking-tight text-primary sm:text-[2.25rem] xl:text-[2.45rem]">
+                      Expert editors matched to the work in front of them.
+                    </h2>
+                    <p className="text-sm leading-6 text-muted-foreground xl:text-base xl:leading-7">
+                      Instead of overwhelming visitors with a large wall of cards, Peekbooks groups editorial expertise by the type of judgement your document needs: academic precision, professional clarity, subject accuracy, and formatting discipline.
+                    </p>
+                  </div>
 
-              <div className="mt-6 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                <p className="max-w-2xl text-sm leading-6 text-white/68">
-                  Matching is handled with subject sensitivity so technical meaning, tone, and context are preserved more accurately across different manuscript types.
-                </p>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  asChild
-                  className="border-white/18 bg-white/8 text-white hover:bg-white/14 hover:border-white/24"
-                >
-                  <Link href="/editors">
-                    Meet Our Editors
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                  <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                    {EDITOR_FIELDS.slice(0, VISIBLE_EXPERT_CARDS).map((field, slot) => (
+                      <div
+                        key={field.name}
+                        className="flex min-h-12 items-center gap-3 rounded-2xl border border-border/70 bg-secondary/35 px-3.5 py-2"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-primary shadow-sm">
+                          <field.icon size={17} strokeWidth={1.7} />
+                        </div>
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={`${slot}-${EXPERT_FIELD_LABELS[expertFieldIndexes[slot]]}`}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.28, ease: "easeOut" }}
+                            className="text-sm font-semibold text-foreground"
+                          >
+                            {EXPERT_FIELD_LABELS[expertFieldIndexes[slot]]}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 flex flex-col gap-4 rounded-[22px] border border-primary/10 bg-primary/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="max-w-xl text-sm leading-5 text-muted-foreground">
+                      If your field is not listed, submit your document anyway. The editorial team will review the scope and confirm the best match.
+                    </p>
+                    <Button asChild>
+                      <Link href="/editors">
+                        Meet Our Editors
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </Container>
@@ -490,9 +625,9 @@ export default function Home() {
               className="grid md:grid-cols-3 gap-6"
             >
               {[
-                { text: "I am very pleased providing my thesis to PEEKBOOKS. They fixed all the awkward phrasing and made my research shine.", name: "Mary Jane", title: "Author" },
+                { text: "I am very pleased providing my thesis to Peekbooks. They fixed all the awkward phrasing and made my research shine.", name: "Mary Jane", title: "Author" },
                 { text: "This service really helped me to be successfully published in top international tier-1 journals. Outstanding work.", name: "Prof. Patel", title: "Cambridge" },
-                { text: "The team at PEEKBOOKS is exceptional. Their two-editor quality check discovered nuances I missed in my own data.", name: "Dr. L. Smith", title: "Researcher" }
+                { text: "The team at Peekbooks is exceptional. Their two-editor quality check discovered nuances I missed in my own data.", name: "Dr. L. Smith", title: "Researcher" }
               ].map((quote, i) => (
                 <motion.div variants={fadeUpVariant} key={i}>
                   <Card className="h-full flex flex-col bg-white border-border hover:shadow-[0_20px_50px_-15px_rgba(30,58,138,0.15)] transition-all relative overflow-hidden rounded-2xl group cursor-default">
@@ -612,7 +747,7 @@ export default function Home() {
               </div>
 
               <div className="flex-1 space-y-6 text-foreground/80 leading-relaxed text-lg relative z-10">
-                <h3 className="text-3xl sm:text-4xl font-bold text-primary font-serif mb-6 leading-tight">The PEEKBOOKS <br />100% Satisfaction Guarantee</h3>
+                <h3 className="text-3xl sm:text-4xl font-bold text-primary font-serif mb-6 leading-tight">The Peekbooks <br />100% Satisfaction Guarantee</h3>
                 <p className="border-l-4 border-primary/30 pl-6 italic">
                   The edited manuscript you receive goes through a rigorous quality control check by our senior editors. If you are unsatisfied with the quality of the edit, we will revise your manuscript for free.
                 </p>
@@ -642,7 +777,7 @@ export default function Home() {
               className="space-y-6 flex flex-col items-center"
             >
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-serif max-w-3xl leading-tight">
-                Join the thousands of highly cited researchers using PEEKBOOKS.
+                Join the authors and researchers using Peekbooks.
               </h2>
               <div className="flex items-center gap-2 text-primary-light/90 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md">
                 <ShieldCheck size={18} />

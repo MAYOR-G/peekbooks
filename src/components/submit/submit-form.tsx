@@ -20,17 +20,22 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { TurnstileWidget } from "@/components/security/turnstile-widget";
 import { cn } from "@/lib/utils";
 import {
   DOCUMENT_TYPE_OPTIONS,
   FORMATTING_OPTIONS,
+  LANGUAGE_STYLE_OPTIONS,
   MANUSCRIPT_SERVICES,
   MAX_MANUSCRIPT_SIZE_BYTES,
+  TRANSCRIPTION_LANGUAGE_OPTIONS,
   TURNAROUND_OPTIONS,
-  calculateQuote,
+  calculateMultiServiceQuote,
   formatCurrency,
   formatFileSize,
 } from "@/lib/submission-config";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 const STEPS = [
   { id: 1, name: "Details" },
@@ -57,8 +62,14 @@ interface FormState {
   academicField: string;
   formattingStyle: (typeof FORMATTING_OPTIONS)[number]["id"];
   notes: string;
-  serviceId: (typeof MANUSCRIPT_SERVICES)[number]["id"];
+  serviceIds: Array<(typeof MANUSCRIPT_SERVICES)[number]["id"]>;
   turnaroundId: (typeof TURNAROUND_OPTIONS)[number]["id"];
+  customFormattingInstructions: string;
+  languageStyle: (typeof LANGUAGE_STYLE_OPTIONS)[number];
+  serviceDetails: string;
+  otherServiceDetails: string;
+  finalWordCount: string;
+  wordCountAdjustmentNote: string;
   fullName: string;
   email: string;
   institution: string;
@@ -71,8 +82,14 @@ const INITIAL_FORM: FormState = {
   academicField: "",
   formattingStyle: "none",
   notes: "",
-  serviceId: "copy-editing",
-  turnaroundId: "standard",
+  serviceIds: ["editing"],
+  turnaroundId: "28d",
+  customFormattingInstructions: "",
+  languageStyle: "No preference",
+  serviceDetails: "",
+  otherServiceDetails: "",
+  finalWordCount: "",
+  wordCountAdjustmentNote: "",
   fullName: "",
   email: "",
   institution: "",
@@ -90,13 +107,15 @@ export function SubmitForm() {
   const [analysis, setAnalysis] = useState<ManuscriptAnalysis | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [surfaceError, setSurfaceError] = useState<string | null>(null);
+  const [surfaceSuccess, setSurfaceSuccess] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [redirectingToPaystack, setRedirectingToPaystack] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const quote = analysis
-    ? calculateQuote({
-        wordCount: analysis.manuscript.wordCount,
-        serviceId: form.serviceId,
+    ? calculateMultiServiceQuote({
+        wordCount: getFinalWordCount(form, analysis),
+        serviceIds: form.serviceIds,
         turnaroundId: form.turnaroundId,
       })
     : null;
@@ -120,6 +139,26 @@ export function SubmitForm() {
     setSurfaceError(null);
   }
 
+  function toggleService(serviceId: FormState["serviceIds"][number]) {
+    setForm((previous) => {
+      const selected = previous.serviceIds.includes(serviceId);
+      const nextServices = selected
+        ? previous.serviceIds.filter((id) => id !== serviceId)
+        : [...previous.serviceIds, serviceId];
+
+      return {
+        ...previous,
+        serviceIds: nextServices.length > 0 ? nextServices : previous.serviceIds,
+      };
+    });
+    setFieldErrors((previous) => {
+      const next = { ...previous };
+      delete next.serviceIds;
+      delete next.serviceId;
+      return next;
+    });
+  }
+
   async function analyzeFile(file: File) {
     setAnalyzing(true);
     setSurfaceError(null);
@@ -127,6 +166,7 @@ export function SubmitForm() {
     try {
       const body = new FormData();
       body.append("file", file);
+      body.append("turnstileToken", turnstileToken);
 
       const response = await fetch("/api/manuscripts/analyze", {
         method: "POST",
@@ -148,6 +188,7 @@ export function SubmitForm() {
       }
 
       setAnalysis(payload);
+      updateForm("finalWordCount", String(payload.manuscript.wordCount));
       setCurrentStep(3);
     } catch (error) {
       setSurfaceError(
@@ -218,6 +259,7 @@ export function SubmitForm() {
 
     setRedirectingToPaystack(true);
     setSurfaceError(null);
+    setSurfaceSuccess(null);
 
     try {
       const response = await fetch("/api/submissions", {
@@ -234,14 +276,24 @@ export function SubmitForm() {
           documentType: form.documentType,
           academicField: form.academicField,
           formattingStyle: form.formattingStyle,
-          serviceId: form.serviceId,
+          serviceId: form.serviceIds[0],
+          serviceIds: form.serviceIds,
           turnaroundId: form.turnaroundId,
           notes: form.notes,
+          customFormattingInstructions: form.customFormattingInstructions,
+          languageStyle: form.languageStyle,
+          serviceDetails:
+            form.serviceIds.includes("transcribing") && form.serviceDetails === "Other"
+              ? `Other: ${form.otherServiceDetails}`
+              : form.serviceDetails,
+          finalWordCount: getFinalWordCount(form, analysis),
+          wordCountAdjustmentNote: form.wordCountAdjustmentNote,
+          turnstileToken,
         }),
       });
 
       const payload = (await response.json()) as
-        | { authorizationUrl: string }
+        | { authorizationUrl: string | null; message?: string; customReview?: boolean }
         | { error: string };
 
       if (!response.ok || "error" in payload) {
@@ -250,7 +302,18 @@ export function SubmitForm() {
         );
       }
 
-      window.location.assign(payload.authorizationUrl);
+      if (payload.authorizationUrl) {
+        window.location.assign(payload.authorizationUrl);
+        return;
+      }
+
+      setSurfaceSuccess(
+        payload.message ||
+          (payload.customReview
+            ? "Your manuscript was submitted for custom review. Peekbooks will confirm timeline and pricing."
+            : "Your manuscript was submitted. Peekbooks will follow up with payment next steps."),
+      );
+      setRedirectingToPaystack(false);
     } catch (error) {
       setSurfaceError(
         error instanceof Error
@@ -262,7 +325,7 @@ export function SubmitForm() {
   }
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-8 xl:min-h-[calc(100vh+38rem)] xl:grid-cols-[minmax(0,1fr)_320px]">
       <Card className="overflow-hidden rounded-[28px] border-border/70 bg-white shadow-[0_30px_80px_-50px_rgba(15,23,42,0.45)]">
         <div className="border-b border-border/70 bg-[linear-gradient(180deg,rgba(239,246,255,0.92),rgba(255,255,255,0.98))] px-6 py-6 sm:px-8">
           <div className="flex flex-col gap-5">
@@ -386,28 +449,6 @@ export function SubmitForm() {
                           ))}
                         </select>
                       </FieldGroup>
-
-                      <FieldGroup
-                        label="Formatting style"
-                        error={fieldErrors.formattingStyle}
-                      >
-                        <select
-                          value={form.formattingStyle}
-                          onChange={(event) =>
-                            updateForm(
-                              "formattingStyle",
-                              event.target.value as FormState["formattingStyle"],
-                            )
-                          }
-                          className={selectClasses(fieldErrors.formattingStyle)}
-                        >
-                          {FORMATTING_OPTIONS.map((option) => (
-                            <option key={option.id} value={option.id}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </FieldGroup>
                     </div>
 
                     <FieldGroup
@@ -444,7 +485,7 @@ export function SubmitForm() {
                   <div className="space-y-8">
                     <SectionIntro
                       title="Upload your manuscript"
-                      description="For dependable automated word counts, upload a DOCX or TXT file. Legacy DOC files should be resaved as DOCX first."
+                      description="Upload a DOC, DOCX, PDF, TXT, or RTF file. Selectable text gives the most dependable word-count detection."
                     />
 
                     <div
@@ -489,7 +530,7 @@ export function SubmitForm() {
                             Choose file
                           </Button>
                           <span className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                            DOCX or TXT only
+                            DOC, DOCX, PDF, TXT, or RTF
                           </span>
                           <span className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                             Max {formatFileSize(MAX_MANUSCRIPT_SIZE_BYTES)}
@@ -501,7 +542,7 @@ export function SubmitForm() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept=".docx,.txt"
+                      accept=".doc,.docx,.pdf,.txt,.rtf"
                       className="hidden"
                       onChange={(event) =>
                         handleFileSelection(event.target.files?.[0] ?? null)
@@ -554,7 +595,7 @@ export function SubmitForm() {
                   <div className="space-y-8">
                     <SectionIntro
                       title="Choose the service and turnaround"
-                      description="The quote below is calculated directly from the detected manuscript word count."
+                      description="Review the detected word count, adjust it only when references, tables, diagrams, or appendices should not be billed, then choose the service and timeline."
                     />
 
                     {analysis ? (
@@ -580,6 +621,37 @@ export function SubmitForm() {
                             </div>
                           </div>
                         </div>
+                        <div className="mt-5 grid gap-4 md:grid-cols-[220px_1fr]">
+                          <FieldGroup
+                            label="Final word count"
+                            hint="You may adjust the word count if the detected count includes references, tables, diagrams, or content that should not be included."
+                            error={fieldErrors.finalWordCount}
+                          >
+                            <Input
+                              type="number"
+                              min={1}
+                              max={500000}
+                              value={form.finalWordCount}
+                              onChange={(event) => updateForm("finalWordCount", event.target.value)}
+                              className={inputClasses(fieldErrors.finalWordCount)}
+                            />
+                          </FieldGroup>
+                          <FieldGroup label="Adjustment note">
+                            <Input
+                              value={form.wordCountAdjustmentNote}
+                              onChange={(event) =>
+                                updateForm("wordCountAdjustmentNote", event.target.value)
+                              }
+                              placeholder="Optional: references excluded, appendix excluded..."
+                              className={inputClasses()}
+                            />
+                          </FieldGroup>
+                        </div>
+                        {getFinalWordCount(form, analysis) > 50000 ? (
+                          <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+                            Large documents above 50,000 words require a custom review. Submit your details and our team will confirm the best timeline and pricing.
+                          </p>
+                        ) : null}
                       </div>
                     ) : null}
 
@@ -593,22 +665,22 @@ export function SubmitForm() {
                             Select the level of intervention that matches the manuscript condition.
                           </p>
                         </div>
-                        {fieldErrors.serviceId ? (
-                          <p className="text-sm text-destructive">{fieldErrors.serviceId}</p>
+                        {fieldErrors.serviceIds ? (
+                          <p className="text-sm text-destructive">{fieldErrors.serviceIds}</p>
                         ) : null}
                       </div>
 
-                      <div className="grid gap-4 lg:grid-cols-3">
+                      <div className="grid gap-3 md:grid-cols-2">
                         {MANUSCRIPT_SERVICES.map((service) => {
-                          const selected = form.serviceId === service.id;
+                          const selected = form.serviceIds.includes(service.id);
 
                           return (
                             <button
                               type="button"
                               key={service.id}
-                              onClick={() => updateForm("serviceId", service.id)}
+                              onClick={() => toggleService(service.id)}
                               className={cn(
-                                "rounded-[24px] border px-5 py-5 text-left transition-all",
+                                "rounded-2xl border px-4 py-4 text-left transition-all",
                                 selected
                                   ? "border-primary bg-primary text-white shadow-[0_18px_45px_-30px_rgba(30,58,138,0.65)]"
                                   : "border-border bg-white hover:border-primary/30 hover:bg-secondary/50",
@@ -620,33 +692,89 @@ export function SubmitForm() {
                               </div>
                               <p
                                 className={cn(
-                                  "mt-3 text-sm leading-6",
+                                  "mt-2 text-sm leading-5",
                                   selected ? "text-white/80" : "text-muted-foreground",
                                 )}
                               >
                                 {service.description}
-                              </p>
-                              <div
-                                className={cn(
-                                  "mt-5 text-sm font-medium",
-                                  selected ? "text-white" : "text-foreground",
-                                )}
-                              >
-                                {formatCurrency(service.ratePerWord, analysis?.currency)} per word
-                              </div>
-                              <p
-                                className={cn(
-                                  "mt-2 text-xs leading-5",
-                                  selected ? "text-white/75" : "text-muted-foreground",
-                                )}
-                              >
-                                {service.turnaroundNote}
                               </p>
                             </button>
                           );
                         })}
                       </div>
                     </div>
+
+                    {form.serviceIds.includes("formatting") ? (
+                      <div className="rounded-[24px] border border-border/70 bg-secondary/35 p-5">
+                        <FieldGroup
+                          label="Formatting style"
+                          hint="Choose the style guide or select custom for special instructions."
+                        >
+                          <select
+                            value={form.formattingStyle}
+                            onChange={(event) =>
+                              updateForm(
+                                "formattingStyle",
+                                event.target.value as FormState["formattingStyle"],
+                              )
+                            }
+                            className={selectClasses()}
+                          >
+                            {FORMATTING_OPTIONS.map((option) => (
+                              <option key={option.id} value={option.id}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </FieldGroup>
+                        {(form.formattingStyle === "custom" ||
+                          form.formattingStyle === "journal-specific") ? (
+                          <FieldGroup label="Formatting instructions">
+                            <Input
+                              value={form.customFormattingInstructions}
+                              onChange={(event) =>
+                                updateForm("customFormattingInstructions", event.target.value)
+                              }
+                              placeholder="Journal name, guide URL, or special layout requirements"
+                              className={inputClasses()}
+                            />
+                          </FieldGroup>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    {form.serviceIds.includes("transcribing") ? (
+                      <div className="rounded-[24px] border border-border/70 bg-secondary/35 p-5">
+                        <FieldGroup label="Transcription language">
+                          <select
+                            value={form.serviceDetails}
+                            onChange={(event) =>
+                              updateForm("serviceDetails", event.target.value)
+                            }
+                            className={selectClasses()}
+                          >
+                            <option value="">Select language</option>
+                            {TRANSCRIPTION_LANGUAGE_OPTIONS.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        </FieldGroup>
+                        {form.serviceDetails === "Other" ? (
+                          <FieldGroup label="Other language">
+                            <Input
+                              value={form.otherServiceDetails}
+                              onChange={(event) =>
+                                updateForm("otherServiceDetails", event.target.value)
+                              }
+                              placeholder="Type the language"
+                              className={inputClasses()}
+                            />
+                          </FieldGroup>
+                        ) : null}
+                      </div>
+                    ) : null}
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-between gap-4">
@@ -666,17 +794,26 @@ export function SubmitForm() {
                       <div className="grid gap-4 md:grid-cols-3">
                         {TURNAROUND_OPTIONS.map((option) => {
                           const selected = form.turnaroundId === option.id;
+                          const finalWordCount = analysis
+                            ? getFinalWordCount(form, analysis)
+                            : 0;
+                          const unavailable =
+                            !!option.maxWords &&
+                            finalWordCount > option.maxWords &&
+                            finalWordCount <= 50000;
 
                           return (
                             <button
                               key={option.id}
                               type="button"
+                              disabled={unavailable}
                               onClick={() => updateForm("turnaroundId", option.id)}
                               className={cn(
                                 "rounded-[24px] border px-5 py-5 text-left transition-all",
                                 selected
                                   ? "border-primary bg-primary/7 shadow-[0_16px_40px_-34px_rgba(30,58,138,0.7)]"
                                   : "border-border bg-white hover:border-primary/20",
+                                unavailable && "cursor-not-allowed opacity-50",
                               )}
                             >
                               <div className="flex items-center justify-between gap-4">
@@ -691,13 +828,31 @@ export function SubmitForm() {
                                 {option.days}
                               </div>
                               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                                {option.description}
+                                {unavailable ? "Choose a longer timeline for this word count." : option.description}
                               </p>
                             </button>
                           );
                         })}
                       </div>
                     </div>
+                    <FieldGroup label="Language and style preference">
+                      <select
+                        value={form.languageStyle}
+                        onChange={(event) =>
+                          updateForm(
+                            "languageStyle",
+                            event.target.value as FormState["languageStyle"],
+                          )
+                        }
+                        className={selectClasses()}
+                      >
+                        {LANGUAGE_STYLE_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </FieldGroup>
                   </div>
                 ) : null}
 
@@ -758,10 +913,38 @@ export function SubmitForm() {
                           </h3>
                           <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
                             <li>Payment is processed securely through Paystack.</li>
-                            <li>Your confirmation and payment emails are sent through Resend.</li>
-                            <li>The editor receives the manuscript and submission metadata immediately after payment is confirmed.</li>
+                            <li>Your submission is saved before payment, so the editor can follow up if checkout is not completed.</li>
+                            <li>Work begins after payment is confirmed.</li>
                           </ul>
                         </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[24px] border border-primary/10 bg-primary/[0.03] p-5 sm:p-6">
+                      <h3 className="font-serif text-xl font-semibold text-foreground">
+                        Review your selection
+                      </h3>
+                      <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                        <ReviewItem label="Document" value={form.documentType} />
+                        <ReviewItem label="Services" value={labelForServices(form.serviceIds)} />
+                        <ReviewItem label="Turnaround" value={labelForTurnaround(form.turnaroundId)} />
+                        <ReviewItem
+                          label="Final word count"
+                          value={
+                            analysis
+                              ? `${getFinalWordCount(form, analysis).toLocaleString()} words`
+                              : "Awaiting upload"
+                          }
+                        />
+                        <ReviewItem
+                          label="Estimated total"
+                          value={
+                            quote && analysis
+                              ? formatCurrency(quote.amount, analysis.currency)
+                              : "Upload to calculate"
+                          }
+                        />
+                        <ReviewItem label="Style" value={form.languageStyle} />
                       </div>
                     </div>
 
@@ -783,12 +966,19 @@ export function SubmitForm() {
                         ) : null}
                       </span>
                     </label>
+
+                    <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={setTurnstileToken} />
                   </div>
                 ) : null}
               </motion.div>
             </AnimatePresence>
           </div>
         </CardContent>
+        {surfaceSuccess ? (
+          <div className="mx-6 mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800 sm:mx-8">
+            {surfaceSuccess}
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-3 border-t border-border/70 bg-slate-50/80 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <Button
@@ -805,7 +995,7 @@ export function SubmitForm() {
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             <p className="text-sm text-muted-foreground">
               {currentStep < 4
-                ? "Your quote remains tied to the detected manuscript word count."
+                ? "Your quote uses the final word count you confirm."
                 : "You will be redirected to Paystack to complete payment securely."}
             </p>
             <Button
@@ -840,8 +1030,8 @@ export function SubmitForm() {
         </div>
       </Card>
 
-      <aside className="space-y-4">
-        <Card className="rounded-[28px] border-border/70 bg-white shadow-[0_28px_80px_-56px_rgba(15,23,42,0.45)]">
+      <aside className="space-y-4 xl:self-stretch">
+        <Card className="quote-summary-wrapper rounded-[28px] border-border/70 bg-white shadow-[0_28px_80px_-56px_rgba(15,23,42,0.45)] xl:sticky xl:top-24 xl:h-fit">
           <CardContent className="space-y-6 px-5 py-6">
             <div className="space-y-2">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
@@ -862,8 +1052,16 @@ export function SubmitForm() {
               }
             />
             <SummaryRow
-              label="Service"
-              value={labelForService(form.serviceId)}
+              label="Final word count"
+              value={
+                analysis
+                  ? `${getFinalWordCount(form, analysis).toLocaleString()} words`
+                  : "Awaiting upload"
+              }
+            />
+            <SummaryRow
+              label="Services"
+              value={labelForServices(form.serviceIds)}
             />
             <SummaryRow
               label="Turnaround"
@@ -971,6 +1169,17 @@ function SummaryRow({
   );
 }
 
+function ReviewItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border/70 bg-white px-4 py-3">
+      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-1 font-medium text-foreground">{value}</div>
+    </div>
+  );
+}
+
 function validateDetailsStep(form: FormState) {
   const errors: Record<string, string> = {};
 
@@ -980,10 +1189,6 @@ function validateDetailsStep(form: FormState) {
 
   if (!form.academicField.trim()) {
     errors.academicField = "Required";
-  }
-
-  if (!form.formattingStyle) {
-    errors.formattingStyle = "Required";
   }
 
   return errors;
@@ -996,12 +1201,36 @@ function validatePricingStep(form: FormState, analysis: ManuscriptAnalysis | nul
     errors.analysis = "Please upload and analyze the manuscript first.";
   }
 
-  if (!form.serviceId) {
-    errors.serviceId = "Required";
+  if (form.serviceIds.length === 0) {
+    errors.serviceIds = "Required";
   }
 
   if (!form.turnaroundId) {
     errors.turnaroundId = "Required";
+  }
+
+  if (analysis) {
+    const finalWordCount = getFinalWordCount(form, analysis);
+
+    if (!Number.isFinite(finalWordCount) || finalWordCount < 1) {
+      errors.finalWordCount = "Enter a valid word count";
+    }
+
+    if (finalWordCount > 500000) {
+      errors.finalWordCount = "Please contact support for very large projects";
+    }
+
+    const turnaround = TURNAROUND_OPTIONS.find(
+      (option) => option.id === form.turnaroundId,
+    );
+
+    if (
+      turnaround?.maxWords &&
+      finalWordCount > turnaround.maxWords &&
+      finalWordCount <= 50000
+    ) {
+      errors.turnaroundId = "Choose a longer turnaround for this word count";
+    }
   }
 
   return errors;
@@ -1045,11 +1274,18 @@ function textareaClasses() {
   return "min-h-32 w-full rounded-[22px] border border-border/80 bg-white px-4 py-3 text-sm text-foreground shadow-none outline-none transition-all placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20";
 }
 
-function labelForService(serviceId: FormState["serviceId"]) {
-  return (
-    MANUSCRIPT_SERVICES.find((service) => service.id === serviceId)?.label ??
-    "Not selected"
-  );
+function labelForServices(serviceIds: FormState["serviceIds"]) {
+  if (serviceIds.length === 0) {
+    return "Not selected";
+  }
+
+  return serviceIds
+    .map(
+      (serviceId) =>
+        MANUSCRIPT_SERVICES.find((service) => service.id === serviceId)?.label ??
+        serviceId,
+    )
+    .join(", ");
 }
 
 function labelForTurnaround(turnaroundId: FormState["turnaroundId"]) {
@@ -1062,4 +1298,14 @@ function labelForTurnaround(turnaroundId: FormState["turnaroundId"]) {
   }
 
   return `${option.label} (${option.days})`;
+}
+
+function getFinalWordCount(form: FormState, analysis: ManuscriptAnalysis) {
+  const parsed = Number(form.finalWordCount);
+
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return analysis.manuscript.wordCount;
+  }
+
+  return Math.round(parsed);
 }

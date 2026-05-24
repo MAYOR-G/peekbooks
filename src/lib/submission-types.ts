@@ -5,6 +5,8 @@ import type {
 } from "@/lib/submission-config";
 
 export type SubmissionStage = "draft" | "payment_pending" | "paid";
+export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed";
+export type ProjectStatus = "pending" | "in_progress" | "completed";
 export type NotificationState = "pending" | "sent" | "failed";
 
 export interface SubmissionRecord {
@@ -12,6 +14,8 @@ export interface SubmissionRecord {
   createdAt: string;
   updatedAt: string;
   stage: SubmissionStage;
+  paymentStatus: PaymentStatus;
+  projectStatus: ProjectStatus;
   manuscript: {
     originalFileName: string;
     storedFileName: string;
@@ -22,6 +26,9 @@ export interface SubmissionRecord {
     mimeType: string;
     sizeBytes: number;
     wordCount: number;
+    detectedWordCount: number;
+    finalWordCount: number;
+    wordCountAdjustmentNote: string;
   };
   customer: {
     fullName: string;
@@ -33,7 +40,11 @@ export interface SubmissionRecord {
     documentType: string;
     academicField: string;
     formattingStyle: FormattingStyleId;
+    customFormattingInstructions: string;
+    languageStyle: string;
+    serviceDetails: string;
     serviceId: ManuscriptServiceId;
+    serviceIds: ManuscriptServiceId[];
     turnaroundId: TurnaroundId;
     notes: string;
   } | null;
@@ -47,7 +58,7 @@ export interface SubmissionRecord {
     reference: string;
     authorizationUrl: string;
     accessCode: string;
-    status: "initialized" | "success";
+    status: "initialized" | "success" | "failed" | "pending";
     paidAt: string | null;
     verifiedAt: string | null;
     channel: string | null;

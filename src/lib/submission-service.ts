@@ -1,4 +1,4 @@
-import { calculateQuote } from "@/lib/submission-config";
+import { calculateMultiServiceQuote } from "@/lib/submission-config";
 import { sendSubmissionNotifications } from "@/lib/notifications";
 import {
   readSubmission,
@@ -30,13 +30,26 @@ export async function finalizeSubmissionFromReference(reference: string) {
     throw new Error("Submission record is incomplete.");
   }
 
-  const expectedQuote = calculateQuote({
-    wordCount: record.manuscript.wordCount,
-    serviceId: record.brief.serviceId,
+  const expectedQuote = calculateMultiServiceQuote({
+    wordCount: record.manuscript.finalWordCount,
+    serviceIds: record.brief.serviceIds ?? [record.brief.serviceId],
     turnaroundId: record.brief.turnaroundId,
   });
 
   if (verification.status !== "success") {
+    record.paymentStatus = verification.status === "failed" ? "failed" : "pending";
+    if (record.payment) {
+      record.payment = {
+        ...record.payment,
+        status: record.paymentStatus === "failed" ? "failed" : "pending",
+        verifiedAt: new Date().toISOString(),
+        gatewayResponse: verification.gateway_response,
+        transactionId: verification.id ? String(verification.id) : record.payment.transactionId,
+      };
+    }
+    record.updatedAt = new Date().toISOString();
+    await saveSubmission(record);
+
     return {
       record,
       verified: false,
@@ -56,6 +69,7 @@ export async function finalizeSubmissionFromReference(reference: string) {
 
   if (!alreadyPaid) {
     record.stage = "paid";
+    record.paymentStatus = "paid";
     record.pricing = {
       amount: expectedQuote.amount,
       baseAmount: expectedQuote.baseAmount,

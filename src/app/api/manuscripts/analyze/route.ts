@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import { analyzeManuscriptFile } from "@/lib/manuscript";
 import { SITE_CURRENCY } from "@/lib/submission-config";
 import {
+  assertRateLimit,
+  getClientIp,
+  jsonError,
+} from "@/lib/security";
+import {
   createDraftSubmissionId,
   persistUploadedFile,
   saveSubmission,
@@ -13,8 +18,16 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    assertRateLimit(`manuscript:${ip}`, 4);
+
     const formData = await request.formData();
     const file = formData.get("file");
+    const honeypot = formData.get("company");
+
+    if (honeypot) {
+      return NextResponse.json({ ok: true });
+    }
 
     if (!(file instanceof File)) {
       return NextResponse.json(
@@ -44,6 +57,8 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       stage: "draft",
+      paymentStatus: "unpaid",
+      projectStatus: "pending",
       manuscript: {
         originalFileName: file.name,
         storedFileName: persistedFile.storedFileName,
@@ -54,6 +69,9 @@ export async function POST(request: Request) {
         mimeType: analysis.mimeType,
         sizeBytes: analysis.sizeBytes,
         wordCount: analysis.wordCount,
+        detectedWordCount: analysis.wordCount,
+        finalWordCount: analysis.wordCount,
+        wordCountAdjustmentNote: "",
       },
       customer: null,
       brief: null,
@@ -80,11 +98,6 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "We could not analyze that manuscript right now.";
-
-    return NextResponse.json({ error: message }, { status: 400 });
+    return jsonError(error, "We could not analyze that manuscript right now.");
   }
 }

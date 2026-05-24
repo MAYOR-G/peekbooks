@@ -5,6 +5,8 @@ import {
   getServiceById,
   getTurnaroundById,
 } from "@/lib/submission-config";
+import type { MessageReply, MessageThread } from "@/lib/contact-types";
+import { readStoredUpload } from "@/lib/contact-store";
 
 export async function sendSubmissionNotifications(record: SubmissionRecord) {
   if (!record.customer || !record.brief || !record.pricing || !record.payment) {
@@ -27,7 +29,7 @@ export async function sendSubmissionNotifications(record: SubmissionRecord) {
 
   const customerPaymentState = await sendIfNeeded(record, "customerPayment", {
     to: [record.customer.email],
-    subject: "Your PeekBooks payment receipt",
+      subject: "Your Peekbooks payment receipt",
     html: buildCustomerPaymentEmail(record),
     replyTo: getEditorEmail(),
   });
@@ -59,6 +61,113 @@ export async function sendSubmissionNotifications(record: SubmissionRecord) {
   await saveSubmission(record);
 
   return record;
+}
+
+export async function sendContactReceivedNotifications(thread: MessageThread) {
+  await sendEmail({
+    to: [thread.senderEmail],
+    subject: "We received your message",
+    html: renderEmailLayout({
+      title: "Your message has reached Peekbooks Editing and Proofreading",
+      intro: `Hello ${thread.senderName},`,
+      body: "Thank you for contacting us. Our editorial team will review your message and reply as soon as possible.",
+      items: [`Subject: ${thread.subject}`, `Reference: ${thread.id}`],
+      closing: `You can reply to our response by email. For urgent context, contact ${getEditorEmail()}.`,
+    }),
+    replyTo: getEditorEmail(),
+  });
+
+  await sendEmail({
+    to: [getEditorEmail()],
+    subject: `New Peekbooks contact message: ${thread.subject}`,
+    html: renderEmailLayout({
+      title: "New contact message",
+      intro: `${thread.senderName} sent a message through the website.`,
+      body: thread.preview,
+      items: [
+        `Name: ${thread.senderName}`,
+        `Email: ${thread.senderEmail}`,
+        `Subject: ${thread.subject}`,
+        `Thread: ${thread.id}`,
+      ],
+      closing: "Open the admin inbox to view the full conversation and any attachments.",
+    }),
+    replyTo: thread.senderEmail,
+  });
+}
+
+export async function sendAdminReplyEmail(thread: MessageThread, reply: MessageReply) {
+  const attachmentContent = reply.attachment
+    ? (await readStoredUpload(reply.attachment)).toString("base64")
+    : null;
+
+  await sendEmail({
+    to: [thread.senderEmail],
+    subject: `Re: ${thread.subject}`,
+    html: renderEmailLayout({
+      title: "A reply from Peekbooks Editing and Proofreading",
+      intro: `Hello ${thread.senderName},`,
+      body: reply.message,
+      items: [`Subject: ${thread.subject}`],
+      closing: "Reply to this email if you need to add anything else. We will keep the conversation together in our editorial inbox.",
+    }),
+    replyTo: getEditorEmail(),
+    attachments: reply.attachment
+      ? [
+          {
+            filename: reply.attachment.originalFileName,
+            content: attachmentContent ?? "",
+          },
+        ]
+      : undefined,
+  });
+}
+
+export async function sendUnpaidSubmissionNotifications(record: SubmissionRecord) {
+  if (!record.customer || !record.brief || !record.pricing) {
+    throw new Error("Submission is missing required data for notifications.");
+  }
+
+  await sendEmail({
+    to: [record.customer.email],
+    subject: "Your manuscript has been submitted",
+    html: renderEmailLayout({
+      title: "Your manuscript has been submitted",
+      intro: `Hello ${record.customer.fullName},`,
+      body: "Your manuscript has been submitted. Once payment is confirmed, our team will begin processing your document.",
+      items: [
+        `Reference: ${record.id}`,
+        `Service: ${getServiceLabel(record)}`,
+        `Turnaround: ${getTurnaroundLabel(record)}`,
+        `Final word count: ${record.manuscript.finalWordCount.toLocaleString()} words`,
+        `Estimated total: ${formatCurrency(record.pricing.amount, record.pricing.currency)}`,
+      ],
+      closing: "You can continue to payment from the submission page or reply to this email if you need help.",
+    }),
+    replyTo: getEditorEmail(),
+  });
+
+  await sendEmail({
+    to: [getEditorEmail()],
+    subject: `New unpaid manuscript submission: ${record.customer.fullName}`,
+    html: renderEmailLayout({
+      title: "New manuscript submission",
+      intro: "A manuscript was submitted before payment.",
+      body: "The submission is saved in the admin dashboard. Follow up if payment is not completed.",
+      items: [
+        `Customer: ${record.customer.fullName}`,
+        `Email: ${record.customer.email}`,
+        `Document type: ${record.brief.documentType}`,
+        `Service: ${getServiceLabel(record)}`,
+        `Payment status: ${record.paymentStatus}`,
+        `Detected word count: ${record.manuscript.detectedWordCount.toLocaleString()} words`,
+        `Final word count: ${record.manuscript.finalWordCount.toLocaleString()} words`,
+        `Estimated total: ${formatCurrency(record.pricing.amount, record.pricing.currency)}`,
+      ],
+      closing: "Open the admin dashboard to download the manuscript and review the project.",
+    }),
+    replyTo: record.customer.email,
+  });
 }
 
 async function sendIfNeeded(
@@ -104,7 +213,7 @@ async function sendEmail(payload: SendEmailPayload) {
       subject: payload.subject,
       html: payload.html,
       reply_to: payload.replyTo,
-      attachments: payload.attachments,
+      attachments: payload.attachments?.filter((attachment) => attachment.content),
     }),
     cache: "no-store",
   });
@@ -127,11 +236,11 @@ function buildCustomerSubmissionEmail(record: SubmissionRecord) {
   return renderEmailLayout({
     title: "Your manuscript is safely in our queue",
     intro: `Hello ${record.customer?.fullName},`,
-    body: `This confirms that PeekBooks has received your manuscript and payment. Our editorial team will review the brief and contact you shortly with the next step in the process.`,
+    body: `This confirms that Peekbooks Editing and Proofreading has received your manuscript and payment. Our editorial team will review the brief and contact you shortly with the next step in the process.`,
     items: [
       `Service: ${getServiceLabel(record)}`,
       `Turnaround: ${getTurnaroundLabel(record)}`,
-      `Detected word count: ${record.manuscript.wordCount.toLocaleString()} words`,
+      `Final word count: ${record.manuscript.finalWordCount.toLocaleString()} words`,
       `Reference: ${record.payment?.reference}`,
     ],
     closing:
@@ -172,7 +281,8 @@ function buildEditorNotificationEmail(record: SubmissionRecord) {
       `Formatting: ${record.brief?.formattingStyle}`,
       `Service: ${getServiceLabel(record)}`,
       `Turnaround: ${getTurnaroundLabel(record)}`,
-      `Word count: ${record.manuscript.wordCount.toLocaleString()} words`,
+      `Detected word count: ${record.manuscript.detectedWordCount.toLocaleString()} words`,
+      `Final word count: ${record.manuscript.finalWordCount.toLocaleString()} words`,
       `File: ${record.manuscript.originalFileName} (${formatBytes(record.manuscript.sizeBytes)})`,
       `Amount paid: ${formatCurrency(record.pricing?.amount ?? 0, record.pricing?.currency)}`,
       `Payment reference: ${record.payment?.reference}`,
@@ -208,7 +318,7 @@ function renderEmailLayout({
     <div style="font-family:Inter,Arial,sans-serif;background:#f8fafc;padding:32px;color:#0f172a;">
       <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
         <div style="padding:28px 32px;border-bottom:1px solid #e2e8f0;background:#eff6ff;">
-          <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#1d4ed8;font-weight:700;">PeekBooks</div>
+          <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#1d4ed8;font-weight:700;">Peekbooks Editing and Proofreading</div>
           <h1 style="margin:12px 0 0;font-size:28px;line-height:1.2;font-family:'Times New Roman',serif;">${escapeHtml(title)}</h1>
         </div>
         <div style="padding:32px;">
@@ -236,7 +346,11 @@ function getServiceLabel(record: SubmissionRecord) {
     return "Unknown";
   }
 
-  return getServiceById(record.brief.serviceId)?.label ?? "Unknown";
+  const serviceIds = record.brief.serviceIds ?? [record.brief.serviceId];
+
+  return serviceIds
+    .map((serviceId) => getServiceById(serviceId)?.label ?? serviceId)
+    .join(", ");
 }
 
 function getTurnaroundLabel(record: SubmissionRecord) {

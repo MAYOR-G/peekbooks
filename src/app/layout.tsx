@@ -13,14 +13,14 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Peak Books Editing and Proofreading",
-  description: "Peak Books Editing and Proofreading for academic, professional, and institutional writing. Confidential, ethical, and transparent.",
+  title: "Peekbooks Editing and Proofreading",
+  description: "Peekbooks Editing and Proofreading for academic, professional, and institutional writing. Confidential, ethical, and transparent.",
   icons: {
     icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/peekbooks-favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
     ],
-    shortcut: "/peekbooks-favicon.svg",
+    shortcut: "/favicon.svg",
     apple: "/peekbooks-favicon.svg",
   },
 };

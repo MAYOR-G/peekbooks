@@ -1,4 +1,4 @@
-import { put, get, head } from "@vercel/blob";
+import { put, get, head, list } from "@vercel/blob";
 import { randomUUID } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -97,6 +97,35 @@ export async function readSubmission(submissionId: string) {
   return normalizeSubmissionRecord(JSON.parse(file) as SubmissionRecord);
 }
 
+export async function listSubmissions() {
+  if (isBlobStorageEnabled()) {
+    const result = await list({ prefix: `${BLOB_SUBMISSIONS_PREFIX}/` });
+    const records = await Promise.all(
+      result.blobs
+        .filter((blob) => blob.pathname.endsWith(".json"))
+        .map(async (blob) => {
+          const file = await readBlobText(blob.pathname);
+          return normalizeSubmissionRecord(JSON.parse(file) as SubmissionRecord);
+        }),
+    );
+
+    return records.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  await ensureSubmissionStorage();
+  const files = await fs.readdir(FILESYSTEM_SUBMISSIONS_DIR);
+  const records = await Promise.all(
+    files
+      .filter((file) => file.endsWith(".json"))
+      .map(async (file) => {
+        const content = await fs.readFile(path.join(FILESYSTEM_SUBMISSIONS_DIR, file), "utf8");
+        return normalizeSubmissionRecord(JSON.parse(content) as SubmissionRecord);
+      }),
+  );
+
+  return records.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
 export async function readSubmissionFile(record: SubmissionRecord) {
   const normalizedRecord = normalizeSubmissionRecord(record);
 
@@ -163,15 +192,42 @@ async function readBlobBuffer(pathname: string) {
 }
 
 function normalizeSubmissionRecord(record: SubmissionRecord) {
+  const detectedWordCount =
+    record.manuscript.detectedWordCount ?? record.manuscript.wordCount;
+  const finalWordCount =
+    record.manuscript.finalWordCount ?? record.manuscript.wordCount;
+
   return {
     ...record,
+    paymentStatus:
+      record.paymentStatus ??
+      (record.payment?.status === "success"
+        ? "paid"
+        : record.payment
+          ? "pending"
+          : "unpaid"),
+    projectStatus: record.projectStatus ?? "pending",
     manuscript: {
       ...record.manuscript,
+      detectedWordCount,
+      finalWordCount,
+      wordCount: finalWordCount,
+      wordCountAdjustmentNote: record.manuscript.wordCountAdjustmentNote ?? "",
       storageProvider:
         record.manuscript.storageProvider ??
         inferStorageProvider(record.manuscript.storagePath),
       storageUrl: record.manuscript.storageUrl ?? null,
     },
+    brief: record.brief
+      ? {
+          ...record.brief,
+          customFormattingInstructions:
+            record.brief.customFormattingInstructions ?? "",
+          languageStyle: record.brief.languageStyle ?? "No preference",
+          serviceDetails: record.brief.serviceDetails ?? "",
+          serviceIds: record.brief.serviceIds ?? [record.brief.serviceId],
+        }
+      : null,
   };
 }
 

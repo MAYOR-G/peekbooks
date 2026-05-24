@@ -173,7 +173,7 @@ export default function EditingServicesPage() {
                                 High-Quality English Editing for Academic Writing
                             </h2>
                             <p className="text-lg text-muted-foreground leading-relaxed">
-                                Whether you are writing an original research article, review, case report, or thesis, our editors have the technical background to understand your field's specific conventions. Select your discipline below to learn more.
+                                Whether you are writing an original research article, review, case report, or thesis, our editors have the technical background to understand your field&apos;s specific conventions. Select your discipline below to learn more.
                             </p>
                         </motion.div>
 

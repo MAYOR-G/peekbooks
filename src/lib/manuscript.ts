@@ -1,10 +1,12 @@
 import mammoth from "mammoth";
 
 import {
-  MAX_MANUSCRIPT_SIZE_BYTES,
-  SUPPORTED_MANUSCRIPT_EXTENSIONS,
   countWordsFromText,
 } from "@/lib/submission-config";
+import {
+  getFileExtension,
+  validateSupportedDocument,
+} from "@/lib/file-validation";
 import type { AnalyzedManuscript } from "@/lib/submission-types";
 
 export async function analyzeManuscriptFile({
@@ -28,13 +30,19 @@ export async function analyzeManuscriptFile({
     textContent = result.value;
   } else if (extension === "txt") {
     textContent = new TextDecoder("utf-8").decode(buffer);
+  } else if (extension === "rtf") {
+    textContent = extractRtfText(buffer);
+  } else if (extension === "pdf") {
+    textContent = extractPlainTextFallback(buffer);
+  } else if (extension === "doc") {
+    textContent = extractPlainTextFallback(buffer);
   }
 
   const wordCount = countWordsFromText(textContent);
 
   if (wordCount === 0) {
     throw new Error(
-      "We could not detect readable text in that file. Please upload a DOCX or TXT manuscript with selectable text.",
+      "We could not detect readable text in that file. Please upload a document with selectable text or enter a corrected word count after upload.",
     );
   }
 
@@ -48,20 +56,21 @@ export async function analyzeManuscriptFile({
   return analysis;
 }
 
-export function getFileExtension(fileName: string) {
-  return fileName.split(".").pop()?.toLowerCase() ?? "";
+export function validateManuscript(fileName: string, sizeBytes: number) {
+  validateSupportedDocument(fileName, sizeBytes);
 }
 
-export function validateManuscript(fileName: string, sizeBytes: number) {
-  const extension = getFileExtension(fileName);
+function extractRtfText(buffer: Buffer) {
+  return new TextDecoder("utf-8")
+    .decode(buffer)
+    .replace(/\\'[0-9a-fA-F]{2}/g, " ")
+    .replace(/\\[a-zA-Z]+\d* ?/g, " ")
+    .replace(/[{}]/g, " ");
+}
 
-  if (!SUPPORTED_MANUSCRIPT_EXTENSIONS.includes(extension as never)) {
-    throw new Error(
-      "Supported manuscript formats are DOCX and TXT. Older DOC files need to be resaved as DOCX before submission.",
-    );
-  }
-
-  if (sizeBytes > MAX_MANUSCRIPT_SIZE_BYTES) {
-    throw new Error("Please upload a file smaller than 10 MB.");
-  }
+function extractPlainTextFallback(buffer: Buffer) {
+  return buffer
+    .toString("utf8")
+    .replace(/[^\x20-\x7E\s]/g, " ")
+    .replace(/\s+/g, " ");
 }

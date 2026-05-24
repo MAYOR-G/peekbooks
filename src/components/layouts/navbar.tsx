@@ -31,6 +31,7 @@ const NAV_LINKS: NavLink[] = [
     },
     { name: "Pricing", path: "/pricing" },
     { name: "Editors", path: "/editors" },
+    { name: "Contact", path: "/contact" },
 ];
 
 export function Navbar() {
@@ -281,7 +282,7 @@ export function Navbar() {
                                         </Link>
                                     </Button>
                                     <p className="text-xs text-center text-muted-foreground">
-                                        Confidential. Ethical. Tracked Changes.
+                                        Confidential. Ethical. Secure.
                                     </p>
                                 </div>
                             </nav>

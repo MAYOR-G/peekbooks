@@ -5,7 +5,7 @@ export const USD_TO_NGN_RATE = Number(process.env.USD_TO_NGN_RATE ?? "1500");
 
 export const MAX_MANUSCRIPT_SIZE_BYTES = 10 * 1024 * 1024;
 
-export const SUPPORTED_MANUSCRIPT_EXTENSIONS = ["docx", "txt"] as const;
+export const SUPPORTED_MANUSCRIPT_EXTENSIONS = ["doc", "docx", "pdf", "txt", "rtf"] as const;
 
 export const FORMATTING_OPTIONS = [
   { id: "none", label: "None / standard consistency" },
@@ -13,18 +13,47 @@ export const FORMATTING_OPTIONS = [
   { id: "mla", label: "MLA" },
   { id: "chicago", label: "Chicago Manual of Style" },
   { id: "harvard", label: "Harvard referencing" },
+  { id: "oscola", label: "OSCOLA" },
+  { id: "ieee", label: "IEEE" },
+  { id: "vancouver", label: "Vancouver" },
+  { id: "turabian", label: "Turabian" },
   { id: "journal-specific", label: "Journal-specific instructions" },
+  { id: "custom", label: "Custom formatting" },
+] as const;
+
+export const LANGUAGE_STYLE_OPTIONS = [
+  "No preference",
+  "American English",
+  "British English",
+  "Canadian English",
+  "Australian English",
+  "Academic tone",
+  "Business tone",
+  "Clear and simple tone",
+  "Journal-specific tone",
+] as const;
+
+export const TRANSCRIPTION_LANGUAGE_OPTIONS = [
+  "English",
+  "French",
+  "Spanish",
+  "Japanese",
+  "Other",
 ] as const;
 
 export const DOCUMENT_TYPE_OPTIONS = [
-  "Journal article",
-  "Thesis or dissertation chapter",
-  "Research proposal",
-  "Grant application",
-  "Book manuscript",
-  "Essay or coursework",
-  "Personal statement / admissions",
-  "Business report / proposal",
+  "Academic Paper",
+  "Thesis / Dissertation",
+  "Journal Article",
+  "Research Proposal",
+  "Business Document",
+  "CV / Résumé",
+  "Book / Manuscript",
+  "Report",
+  "Personal Statement",
+  "Statement of Purpose",
+  "Grant Proposal",
+  "Coursework / Essay",
   "Other",
 ] as const;
 
@@ -33,46 +62,122 @@ export const MANUSCRIPT_SERVICES = [
     id: "proofreading",
     label: "Proofreading",
     description: "Grammar, punctuation, spelling, and consistency polishing.",
-    ratePerWord: 0.018,
+    ratePerWord: 0.03,
     turnaroundNote: "Best when the draft is already structurally sound.",
   },
   {
-    id: "copy-editing",
-    label: "Copy-editing",
+    id: "editing",
+    label: "Editing",
     description: "Sentence-level clarity, tone, flow, and editorial corrections.",
-    ratePerWord: 0.032,
+    ratePerWord: 0.03,
     turnaroundNote: "Recommended for most academic and professional manuscripts.",
   },
   {
-    id: "substantive-editing",
-    label: "Substantive editing",
-    description: "Deeper intervention for structure, coherence, and readability.",
-    ratePerWord: 0.05,
-    turnaroundNote: "Ideal for complex drafts that need stronger organization.",
+    id: "academic-editing",
+    label: "Academic Editing",
+    description: "Discipline-aware editing for scholarly papers, theses, and journals.",
+    ratePerWord: 0.03,
+    turnaroundNote: "Best for research, dissertations, and peer-review submissions.",
+  },
+  {
+    id: "business-editing",
+    label: "Business Editing",
+    description: "Precise editing for reports, proposals, profiles, and executive documents.",
+    ratePerWord: 0.03,
+    turnaroundNote: "Ideal for professional and institutional documents.",
+  },
+  {
+    id: "formatting",
+    label: "Formatting",
+    description: "Reference, style, layout, and journal guideline formatting.",
+    ratePerWord: 0.04,
+    turnaroundNote: "Choose a formatting style or provide custom requirements.",
+  },
+  {
+    id: "translation",
+    label: "Translation",
+    description: "Careful language translation with editorial review.",
+    ratePerWord: 0.055,
+    turnaroundNote: "Timeline may vary based on language pair and document length.",
+  },
+  {
+    id: "transcribing",
+    label: "Transcribing",
+    description: "Clear written transcripts from audio or dictated content.",
+    ratePerWord: 0.025,
+    turnaroundNote: "A team member may confirm audio quality before final pricing.",
+  },
+  {
+    id: "writing-support",
+    label: "Writing Support",
+    description: "Structured writing guidance and editorial development support.",
+    fixedAmount: 450,
+    turnaroundNote: "Package-based support; final scope may be confirmed by email.",
+  },
+  {
+    id: "cv-resume",
+    label: "CV / Résumé",
+    description: "Sharper professional profile, résumé, and CV editing.",
+    fixedAmount: 120,
+    turnaroundNote: "Package pricing for career documents.",
+  },
+  {
+    id: "copywriting",
+    label: "Copywriting",
+    description: "Professional copy support for web, brand, and business materials.",
+    fixedAmount: 350,
+    turnaroundNote: "Package pricing; final scope may be confirmed after review.",
   },
 ] as const;
 
 export const TURNAROUND_OPTIONS = [
   {
-    id: "standard",
-    label: "Standard",
-    days: "4 weeks and above",
-    multiplier: 1,
-    description: "Balanced turnaround for most submissions.",
+    id: "24h",
+    label: "24 hours",
+    days: "24 hours",
+    multiplier: 1.85,
+    maxWords: 5000,
+    description: "Only available for concise documents under 5,000 words.",
   },
   {
-    id: "priority",
-    label: "Priority",
-    days: "2 weeks",
-    multiplier: 1.35,
-    description: "Expedited editorial scheduling for tighter deadlines.",
+    id: "48h",
+    label: "48 hours",
+    days: "48 hours",
+    multiplier: 1.6,
+    maxWords: 10000,
+    description: "Fast editorial scheduling for smaller documents.",
   },
   {
-    id: "express",
-    label: "Express",
+    id: "3d",
+    label: "3 days",
+    days: "3 days",
+    multiplier: 1.4,
+    maxWords: 10000,
+    description: "Expedited editing for shorter papers and urgent submissions.",
+  },
+  {
+    id: "7d",
+    label: "7 days",
     days: "7 days",
-    multiplier: 1.75,
-    description: "Reserved for urgent manuscripts that need immediate attention.",
+    multiplier: 1.25,
+    maxWords: 30000,
+    description: "A balanced rush option for medium-length manuscripts.",
+  },
+  {
+    id: "14d",
+    label: "14 days",
+    days: "14 days",
+    multiplier: 1.1,
+    maxWords: 30000,
+    description: "Recommended for substantial academic and business documents.",
+  },
+  {
+    id: "28d",
+    label: "28 days",
+    days: "28 days",
+    multiplier: 1,
+    maxWords: 50000,
+    description: "Best for full manuscripts and longer projects.",
   },
 ] as const;
 
@@ -104,17 +209,45 @@ export function calculateQuote({
     throw new Error("Invalid service or turnaround selection.");
   }
 
-  const baseAmountUsd = wordCount * service.ratePerWord;
-  const multipliedAmountUsd = baseAmountUsd * turnaround.multiplier;
+  const baseAmountBeforeTurnaround =
+    "fixedAmount" in service ? service.fixedAmount : wordCount * service.ratePerWord;
+  const multipliedAmountUsd = baseAmountBeforeTurnaround * turnaround.multiplier;
   const amount = roundCurrency(
     convertUsdAmount(multipliedAmountUsd, SITE_CURRENCY),
   );
 
   return {
     amount,
-    baseAmount: roundCurrency(convertUsdAmount(baseAmountUsd, SITE_CURRENCY)),
+    baseAmount: roundCurrency(convertUsdAmount(baseAmountBeforeTurnaround, SITE_CURRENCY)),
     service,
     turnaround,
+    minimumApplied: false,
+  };
+}
+
+export function calculateMultiServiceQuote({
+  wordCount,
+  serviceIds,
+  turnaroundId,
+}: {
+  wordCount: number;
+  serviceIds: ManuscriptServiceId[];
+  turnaroundId: TurnaroundId;
+}) {
+  const selectedServiceIds = serviceIds.length > 0 ? serviceIds : ["editing" as ManuscriptServiceId];
+  const quotes = selectedServiceIds.map((serviceId) =>
+    calculateQuote({ wordCount, serviceId, turnaroundId }),
+  );
+  const amount = roundCurrency(quotes.reduce((total, quote) => total + quote.amount, 0));
+  const baseAmount = roundCurrency(
+    quotes.reduce((total, quote) => total + quote.baseAmount, 0),
+  );
+
+  return {
+    amount,
+    baseAmount,
+    services: quotes.map((quote) => quote.service),
+    turnaround: quotes[0]?.turnaround ?? getTurnaroundById(turnaroundId),
     minimumApplied: false,
   };
 }
