@@ -156,7 +156,7 @@ export default function EditorsPage() {
             <SectionHeader
               eyebrow="Quality standards"
               title="Editors are selected against a clear quality bar."
-              description="The page now explains the standards more clearly and with more structure, instead of reading like a simple checklist."
+              description="Our rigorous selection and review process ensures that every manuscript receives the highest level of professional attention, tailored to its specific discipline."
             />
 
             <div className="grid gap-6 lg:grid-cols-3">
@@ -188,7 +188,7 @@ export default function EditorsPage() {
               <SectionHeader
                 eyebrow="Selection approach"
                 title="How editorial assignment is treated."
-                description="This gives the editors page more substance and trust than a generic standards list."
+                description="We ensure your manuscript is handled by an expert who understands the nuances of your field."
                 align="left"
               />
               <div className="rounded-[26px] border border-border/70 bg-white p-6 shadow-sm">
@@ -224,7 +224,7 @@ export default function EditorsPage() {
             <SectionHeader
               eyebrow="Field coverage"
               title="Examples of the disciplines and editorial lanes we support."
-              description="This section now feels more structured and product-grade instead of looking like a plain icon wall."
+              description="From STEM research to humanities and business copy, our editors cover a wide spectrum of academic and professional fields."
             />
 
             <div className="rounded-[30px] border border-slate-900/85 bg-slate-950 p-6 text-white shadow-[0_36px_90px_-60px_rgba(15,23,42,0.82)] sm:p-8">
@@ -264,7 +264,7 @@ export default function EditorsPage() {
                     Ready to submit your manuscript for expert review?
                   </h2>
                   <p className="max-w-2xl text-base leading-7 text-white/78">
-                    Move from editor standards to the actual submission flow without friction. The goal is confidence, not clutter.
+                    Get a clear estimate and pair your work with an editor who understands your discipline.
                   </p>
                 </div>
 

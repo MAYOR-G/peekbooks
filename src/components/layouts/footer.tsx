@@ -11,6 +11,7 @@ const FOOTER_LINKS = [
   { name: "More Services", path: "/services/additional" },
   { name: "Pricing", path: "/pricing" },
   { name: "Editors", path: "/editors" },
+  { name: "Blog", path: "/blog" },
   { name: "Contact", path: "/contact" },
   { name: "Submit", path: "/submit" },
 ];
