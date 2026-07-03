@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 import { getBlogPostBySlug, getAllBlogPosts } from "@/lib/blog";
-import { buildPageMetadata } from "@/lib/seo";
+import { buildPageMetadata, generateBreadcrumbSchema, generateFAQSchema } from "@/lib/seo";
+import { BRAND_NAME, PRODUCTION_SITE_URL } from "@/lib/site";
 import { Navbar } from "@/components/layouts/navbar";
 import { Footer } from "@/components/layouts/footer";
 import { Container } from "@/components/layouts/container";
@@ -24,9 +25,10 @@ export async function generateMetadata(
   }
 
   return buildPageMetadata({
-    title: post.title,
+    title: post.seoTitle,
     description: post.excerpt,
     canonicalPath: `/blog/${post.slug}`,
+    keywords: post.tags,
     openGraph: {
       type: "article",
       publishedTime: post.date,
@@ -52,14 +54,32 @@ export default async function BlogPostPage({ params }: Props) {
 
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": post.title,
-    "datePublished": new Date(post.date).toISOString(),
-    "author": {
+    "@type": "BlogPosting",
+    "@id": `${PRODUCTION_SITE_URL}/blog/${post.slug}#article`,
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: new Date(post.date).toISOString(),
+    dateModified: new Date(post.updated).toISOString(),
+    mainEntityOfPage: `${PRODUCTION_SITE_URL}/blog/${post.slug}`,
+    author: {
       "@type": "Organization",
-      "name": post.author
-    }
+      name: post.author
+    },
+    publisher: {
+      "@type": "Organization",
+      name: BRAND_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: `${PRODUCTION_SITE_URL}/icon.svg`,
+      },
+    },
   };
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ]);
+  const faqSchema = post.faqs?.length ? generateFAQSchema(post.faqs) : null;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -70,6 +90,16 @@ export default async function BlogPostPage({ params }: Props) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+        {faqSchema ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          />
+        ) : null}
         
         <Container className="max-w-3xl">
           <Link href="/blog" className="inline-flex items-center text-sm font-semibold text-primary mb-8 hover:underline">
@@ -83,6 +113,9 @@ export default async function BlogPostPage({ params }: Props) {
                 <time dateTime={post.date} className="flex items-center">
                   <Calendar className="mr-1.5 h-4 w-4" />
                   {new Date(post.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                </time>
+                <time dateTime={post.updated} className="flex items-center">
+                  Updated {new Date(post.updated).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </time>
                 <div className="flex items-center">
                   <Clock className="mr-1.5 h-4 w-4" />
@@ -119,7 +152,7 @@ export default async function BlogPostPage({ params }: Props) {
             )}
 
             <div 
-              className="prose prose-lg max-w-none text-foreground/80 prose-headings:font-serif prose-headings:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-table:border-collapse prose-table:w-full prose-table:rounded-xl prose-table:overflow-hidden prose-table:shadow-sm prose-table:border prose-table:border-slate-200 prose-th:bg-slate-50 prose-th:p-4 prose-th:text-left prose-td:p-4 prose-td:border-t prose-td:border-slate-100"
+              className="max-w-none text-[1.05rem] leading-8 text-slate-700 [&_a]:font-semibold [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary/80 [&_blockquote]:my-8 [&_blockquote]:rounded-2xl [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-primary/5 [&_blockquote]:px-6 [&_blockquote]:py-5 [&_blockquote]:font-medium [&_blockquote]:text-foreground [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:font-serif [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground [&_h3]:mb-3 [&_h3]:mt-8 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-foreground [&_li]:mb-2 [&_li]:pl-1 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_p]:mb-5 [&_p]:text-slate-700 [&_strong]:font-bold [&_strong]:text-foreground [&_table]:my-8 [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto [&_table]:rounded-2xl [&_table]:border [&_table]:border-slate-200 [&_table]:bg-white [&_table]:text-sm [&_tbody_tr:nth-child(even)]:bg-slate-50/70 [&_td]:min-w-40 [&_td]:border-t [&_td]:border-slate-100 [&_td]:p-4 [&_td]:align-top [&_th]:min-w-40 [&_th]:bg-primary/8 [&_th]:p-4 [&_th]:text-left [&_th]:font-bold [&_th]:text-foreground [&_ul]:my-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 

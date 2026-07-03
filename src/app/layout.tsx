@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { buildPageMetadata, generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
+import { buildPageMetadata, generateOrganizationSchema, generateProfessionalServiceSchema, generateWebsiteSchema } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -14,9 +14,10 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Peekbooks Editing and Proofreading | Professional Services",
-  description: "Peekbooks provides professional editing, proofreading, formatting, and translation services for academic, business, and author writing. Trusted by researchers worldwide.",
+  title: "Professional Editing and Proofreading Services",
+  description: "PeekBooks Editors provides human editing, proofreading, formatting, and document support for academic, business, author, and professional writing.",
   canonicalPath: "/",
+  keywords: ["professional editing services", "proofreading services", "academic editing", "manuscript editing", "PeekBooks Editors"],
 });
 
 export default function RootLayout({
@@ -26,6 +27,7 @@ export default function RootLayout({
 }>) {
   const orgSchema = generateOrganizationSchema();
   const webSchema = generateWebsiteSchema();
+  const serviceSchema = generateProfessionalServiceSchema();
 
   return (
     <html lang="en" className="antialiased">
@@ -37,6 +39,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
         />
       </head>
       <body

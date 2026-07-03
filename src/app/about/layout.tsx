@@ -1,9 +1,10 @@
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata = buildPageMetadata({
-  title: "About Us",
-  description: "Learn about Peekbooks Editing and Proofreading. Our expert team combines years of publishing experience to make every document publication-worthy.",
+  title: "About PeekBooks Editors",
+  description: "Learn how PeekBooks Editors supports academic, business, author, and professional documents with confidential human editing and quality assurance.",
   canonicalPath: "/about",
+  keywords: ["about PeekBooks Editors", "human editing team", "professional proofreaders", "editorial quality assurance"],
 });
 
 export default function AboutLayout({ children }: { children: React.ReactNode }) {

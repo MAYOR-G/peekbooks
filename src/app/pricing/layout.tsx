@@ -1,9 +1,10 @@
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata = buildPageMetadata({
-  title: "Pricing & Services",
-  description: "Get a clear, upfront estimate for editing, proofreading, formatting, and translation services. Transparent pricing based on your specific needs.",
+  title: "Editing and Proofreading Pricing",
+  description: "Estimate editing, proofreading, formatting, translation, CV, academic, and business document pricing by service, word count, and turnaround.",
   canonicalPath: "/pricing",
+  keywords: ["editing pricing", "proofreading cost", "academic proofreading cost", "manuscript editing quote"],
 });
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {

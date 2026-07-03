@@ -16,6 +16,18 @@ const FOOTER_LINKS = [
   { name: "Submit", path: "/submit" },
 ];
 
+const SERVICE_LINKS = [
+  { name: "Dissertation Proofreading", path: "/dissertation-proofreading" },
+  { name: "Thesis Proofreading", path: "/thesis-proofreading" },
+  { name: "Academic Editing", path: "/academic-editing" },
+  { name: "Manuscript Editing", path: "/manuscript-editing" },
+  { name: "Journal Paper Editing", path: "/journal-paper-editing" },
+  { name: "CV Editing", path: "/cv-editing-service" },
+  { name: "Business Document Editing", path: "/business-document-editing" },
+  { name: "Proofreading Services UK", path: "/proofreading-services-uk" },
+  { name: "Proofreading Services USA", path: "/proofreading-services-usa" },
+];
+
 export function Footer() {
   return (
     <footer className="relative mt-auto w-full overflow-hidden bg-[#17347f] pt-28 text-white">
@@ -35,7 +47,7 @@ export function Footer() {
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_32%),linear-gradient(135deg,rgba(255,255,255,0.06),transparent_45%)]" />
 
-      <Container className="relative z-10 grid gap-10 pb-10 lg:grid-cols-[1.15fr_0.65fr_1fr]">
+      <Container className="relative z-10 grid gap-10 pb-10 lg:grid-cols-[1.05fr_0.55fr_0.8fr_1fr]">
         <div className="space-y-5">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-primary shadow-md">
@@ -110,6 +122,24 @@ export function Footer() {
 
         <div className="space-y-4">
           <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
+            Services
+          </h4>
+          <ul className="grid gap-3">
+            {SERVICE_LINKS.map((link) => (
+              <li key={link.name}>
+                <Link
+                  href={link.path}
+                  className="text-sm text-white/70 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-sm"
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
             Offices
           </h4>
           <div className="grid gap-4">
@@ -137,7 +167,7 @@ export function Footer() {
           </Link>
         </div>
 
-        <div className="border-t border-white/12 pt-6 lg:col-span-3">
+        <div className="border-t border-white/12 pt-6 lg:col-span-4">
           <p className="text-sm text-white/62">
             © {new Date().getFullYear()} Peekbooks Editing and Proofreading. All rights reserved.
           </p>

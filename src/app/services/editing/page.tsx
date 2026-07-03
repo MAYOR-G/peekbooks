@@ -3,7 +3,6 @@
 import { motion, Variants } from "framer-motion";
 import { CheckCircle2, FileText, Briefcase, GraduationCap, ChevronRight, Check } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 import { Navbar } from "@/components/layouts/navbar";
 import { Footer } from "@/components/layouts/footer";
@@ -78,12 +77,44 @@ const nonAcademicCategories = [
     }
 ];
 
+const serviceFaqs = [
+    {
+        question: "What is included in editing and proofreading?",
+        answer: "Editing improves clarity, structure, wording, tone, and flow. Proofreading checks grammar, spelling, punctuation, formatting consistency, and final errors. The best choice depends on whether your document still needs rewriting support or only a final polish."
+    },
+    {
+        question: "Can you edit dissertations, theses, and journal papers?",
+        answer: "Yes. PeekBooks Editors supports dissertations, theses, research papers, journal manuscripts, case reports, reviews, and academic applications. Include your university or journal instructions during submission."
+    },
+    {
+        question: "Do editors preserve my voice and meaning?",
+        answer: "Yes. Editors improve readability and correctness while preserving author intent. For academic documents, editors follow ethical boundaries and do not create research, fabricate references, or change findings."
+    }
+];
+
 export default function EditingServicesPage() {
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
 
             <main className="flex-1 pt-24">
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            mainEntity: serviceFaqs.map((faq) => ({
+                                "@type": "Question",
+                                name: faq.question,
+                                acceptedAnswer: {
+                                    "@type": "Answer",
+                                    text: faq.answer
+                                }
+                            }))
+                        })
+                    }}
+                />
                 {/* Hero Section */}
                 <section className="bg-primary pt-20 pb-24 relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
@@ -268,6 +299,40 @@ export default function EditingServicesPage() {
                                 <Link href="/submit">Submit Your Manuscript</Link>
                             </Button>
                         </motion.div>
+                    </Container>
+                </section>
+
+                <section className="py-20 bg-white">
+                    <Container className="grid gap-10 lg:grid-cols-[1fr_0.8fr]">
+                        <div>
+                            <h2 className="text-3xl font-serif font-bold text-foreground mb-8">Frequently Asked Questions</h2>
+                            <div className="space-y-4">
+                                {serviceFaqs.map((faq) => (
+                                    <details key={faq.question} className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                                        <summary className="cursor-pointer font-semibold text-foreground">{faq.question}</summary>
+                                        <p className="mt-4 text-sm leading-7 text-muted-foreground">{faq.answer}</p>
+                                    </details>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                            <h2 className="text-2xl font-serif font-bold text-foreground">Explore focused services</h2>
+                            <div className="mt-6 grid gap-3">
+                                {[
+                                    ["Dissertation proofreading", "/dissertation-proofreading"],
+                                    ["Thesis proofreading", "/thesis-proofreading"],
+                                    ["Academic editing", "/academic-editing"],
+                                    ["Journal paper editing", "/journal-paper-editing"],
+                                    ["Business document editing", "/business-document-editing"],
+                                    ["CV editing service", "/cv-editing-service"]
+                                ].map(([label, href]) => (
+                                    <Link key={href} href={href} className="flex items-center justify-between rounded-xl bg-white px-4 py-3 text-sm font-semibold text-primary hover:bg-primary/5">
+                                        {label}
+                                        <ChevronRight className="h-4 w-4" />
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
                     </Container>
                 </section>
             </main>

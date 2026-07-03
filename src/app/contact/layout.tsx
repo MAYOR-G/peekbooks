@@ -1,16 +1,17 @@
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata = buildPageMetadata({
-  title: "Contact Us",
-  description: "Get in touch with Peekbooks for any questions regarding our editing and proofreading services. Our support team is ready to assist you.",
+  title: "Contact PeekBooks Editors",
+  description: "Contact PeekBooks Editors for editing, proofreading, pricing, submission, turnaround, confidentiality, and document support questions.",
   canonicalPath: "/contact",
+  keywords: ["contact PeekBooks Editors", "editing support", "proofreading enquiry", "manuscript editing contact"],
 });
 
 export default function ContactLayout({ children }: { children: React.ReactNode }) {
   const localBusinessSchema = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    "name": "Peekbooks Editing and Proofreading",
+    "name": "PeekBooks Editors",
     "image": "https://www.peekbookeditors.com/icon.svg",
     "@id": "https://www.peekbookeditors.com",
     "url": "https://www.peekbookeditors.com",

@@ -1,4 +1,4 @@
-export const BRAND_NAME = "Peekbooks Editing and Proofreading";
+export const BRAND_NAME = "PeekBooks Editors";
 export const PRODUCTION_SITE_URL = "https://www.peekbookeditors.com";
 
 export const SITE_CONTACT = {

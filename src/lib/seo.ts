@@ -1,10 +1,11 @@
 import { Metadata } from "next";
-import { BRAND_NAME, PRODUCTION_SITE_URL } from "./site";
+import { BRAND_NAME, PRODUCTION_SITE_URL, SITE_CONTACT } from "./site";
 
 interface PageSEOProps {
   title: string;
   description: string;
   canonicalPath?: string;
+  keywords?: string[];
   openGraph?: {
     images?: Array<{ url: string; width: number; height: number; alt: string }>;
     type?: "website" | "article";
@@ -18,6 +19,7 @@ export function buildPageMetadata({
   title,
   description,
   canonicalPath,
+  keywords,
   openGraph,
   noindex = false,
 }: PageSEOProps): Metadata {
@@ -27,9 +29,9 @@ export function buildPageMetadata({
 
   const defaultOgImages = [
     {
-      url: `${PRODUCTION_SITE_URL}/og-image.jpg`, // Default OG Image placeholder
+      url: `${PRODUCTION_SITE_URL}/service-image.png`,
       width: 1200,
-      height: 630,
+      height: 800,
       alt: `${BRAND_NAME} - Professional Editing and Proofreading`,
     },
   ];
@@ -40,6 +42,7 @@ export function buildPageMetadata({
       template: `%s | ${BRAND_NAME}`,
     },
     description,
+    keywords,
     alternates: {
       canonical: url,
     },
@@ -87,11 +90,14 @@ export function generateOrganizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${PRODUCTION_SITE_URL}/#organization`,
     name: BRAND_NAME,
+    legalName: "Peekbooks Editing and Proofreading",
     url: PRODUCTION_SITE_URL,
     logo: `${PRODUCTION_SITE_URL}/icon.svg`,
     sameAs: [
-      // Add social links here if available
+      SITE_CONTACT.socials.twitter,
+      SITE_CONTACT.socials.linkedin,
     ],
     contactPoint: {
       "@type": "ContactPoint",
@@ -108,7 +114,115 @@ export function generateWebsiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${PRODUCTION_SITE_URL}/#website`,
     name: BRAND_NAME,
     url: PRODUCTION_SITE_URL,
+    publisher: {
+      "@id": `${PRODUCTION_SITE_URL}/#organization`,
+    },
+  };
+}
+
+export function generateProfessionalServiceSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": `${PRODUCTION_SITE_URL}/#professional-service`,
+    name: BRAND_NAME,
+    url: PRODUCTION_SITE_URL,
+    image: `${PRODUCTION_SITE_URL}/service-image.png`,
+    telephone: SITE_CONTACT.phone,
+    email: SITE_CONTACT.publicEmail,
+    priceRange: "$$",
+    areaServed: ["GB", "US", "Worldwide"],
+    address: [
+      {
+        "@type": "PostalAddress",
+        streetAddress: "2/2 19 Dunphail Drive",
+        addressLocality: "Glasgow",
+        postalCode: "G34 0DB",
+        addressCountry: "GB",
+      },
+      {
+        "@type": "PostalAddress",
+        streetAddress: "1270 Hardin City Rd",
+        addressLocality: "East Lansing",
+        addressRegion: "MI",
+        addressCountry: "US",
+      },
+    ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Editing and proofreading services",
+      itemListElement: [
+        "Dissertation proofreading",
+        "Thesis proofreading",
+        "Academic editing",
+        "Manuscript editing",
+        "Journal paper editing",
+        "CV editing",
+        "Business document editing",
+      ].map((name) => ({
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name,
+        },
+      })),
+    },
+  };
+}
+
+export function generateBreadcrumbSchema(items: Array<{ name: string; path: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: `${PRODUCTION_SITE_URL}${item.path === "/" ? "" : item.path}`,
+    })),
+  };
+}
+
+export function generateFAQSchema(faqs: Array<{ question: string; answer: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+export function generateServiceSchema({
+  name,
+  description,
+  path,
+  areaServed = ["GB", "US", "Worldwide"],
+}: {
+  name: string;
+  description: string;
+  path: string;
+  areaServed?: string[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${PRODUCTION_SITE_URL}${path}#service`,
+    name,
+    description,
+    provider: {
+      "@id": `${PRODUCTION_SITE_URL}/#organization`,
+    },
+    areaServed,
+    serviceType: name,
+    url: `${PRODUCTION_SITE_URL}${path}`,
   };
 }

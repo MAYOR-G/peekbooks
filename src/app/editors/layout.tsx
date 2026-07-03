@@ -1,9 +1,10 @@
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata = buildPageMetadata({
-  title: "Meet Our Editors",
-  description: "Our professional editors hold advanced degrees and have years of publishing experience across multiple academic and professional disciplines.",
+  title: "Meet the Editors",
+  description: "Meet the human editors supporting academic manuscripts, business documents, CVs, theses, dissertations, and professional writing.",
   canonicalPath: "/editors",
+  keywords: ["professional editors", "academic editors", "human proofreaders", "manuscript editors"],
 });
 
 export default function EditorsLayout({ children }: { children: React.ReactNode }) {

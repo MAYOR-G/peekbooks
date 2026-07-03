@@ -96,13 +96,12 @@ export default function AboutPage() {
                   variants={fadeUpVariant}
                   className="text-lg font-medium leading-relaxed text-foreground/80"
                 >
-                  PEEKBOOKS is a trusted brand in author services for the global
-                  research community. Since our establishment, we have worked with
-                  researchers in hundreds of universities and research labs around
-                  the globe, improving the communication of their research and
-                  helping them achieve successful publication. Our services are
-                  preferred by leading publishers, societies, and academic
-                  institutions worldwide.
+                  PEEKBOOKS supports authors, researchers, students, and
+                  professionals who need careful human editing before submission.
+                  Our editors work on manuscripts prepared for universities,
+                  journals, publishers, institutions, businesses, and professional
+                  applications, helping clients communicate their work with
+                  greater clarity and confidence.
                 </motion.p>
                 <motion.p
                   variants={fadeUpVariant}
@@ -179,12 +178,12 @@ export default function AboutPage() {
                 className="mx-auto max-w-4xl rounded-3xl border border-border/50 bg-white p-8 shadow-xs sm:p-12 md:p-16"
               >
                 <p className="text-lg leading-relaxed text-foreground/80 sm:text-xl">
-                  Each editor at PEEKBOOKS&apos;s services has been selected because
-                  of their highly specialized technical research background.
+                  Each editor at PEEKBOOKS&apos;s services is selected for strong
+                  language judgment, document sensitivity, and relevant subject
+                  familiarity.
                   <strong className="font-semibold text-foreground">
-                    {" "}All our editors have earned master&apos;s or PhD degrees
-                    from top-tier institutions and possess immense publishing
-                    experience.
+                    {" "}Projects are matched to editors whose experience fits
+                    the document type, field, and level of review requested.
                   </strong>
                   <br />
                   <br />
@@ -251,13 +250,10 @@ export default function AboutPage() {
                     variants={fadeUpVariant}
                     className="text-base leading-relaxed text-white/80 sm:text-lg"
                   >
-                    Our experienced editors have edited over{" "}
-                    <strong className="font-bold text-white">12,000+ manuscripts</strong>{" "}
-                    in the last decade and rigidly maintain the highest standards
-                    of thoroughness and quality. They improve the grammar, flow,
-                    formatting, and readability of your papers, ensuring the
-                    language in your document is clearly stated, grammatically
-                    correct, and publication-ready.
+                    Our editors maintain rigorous standards for clarity,
+                    confidentiality, and ethical editing. They improve grammar,
+                    flow, formatting, and readability while preserving the
+                    author&apos;s meaning and responsibility for the final document.
                   </motion.p>
                 </div>
 

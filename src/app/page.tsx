@@ -106,6 +106,49 @@ const EXPERT_FIELD_LABELS = [
 
 const VISIBLE_EXPERT_CARDS = 10;
 
+const HOME_FAQS = [
+  {
+    question: "How exactly is the word count calculated?",
+    answer: "Your word count is based on the full visible content of your document as shown in your word processor. Tables, headings, footnotes, and references may be included when they require editorial review.",
+  },
+  {
+    question: "Are there any minimum fees?",
+    answer: "No minimum fee is shown in the pricing calculator. Final pricing depends on your chosen service, word count, turnaround, and any custom scope confirmed during submission.",
+  },
+  {
+    question: "When and how do I pay?",
+    answer: "After you submit your manuscript and confirm the quote, payment is completed through the secure payment flow. Editing begins after payment and project scope are confirmed.",
+  },
+  {
+    question: "Does the price include reference formatting?",
+    answer: "Standard editing can include light reference consistency checks. Extensive citation correction, bibliography restructuring, or journal-specific formatting may be quoted as an additional formatting service.",
+  },
+  {
+    question: "Will an editor change my meaning or argument?",
+    answer: "No. Editors improve the language, flow, and presentation of your document while protecting your intended meaning. If a sentence is unclear, the editor may leave a comment rather than guess what you meant.",
+  },
+  {
+    question: "Can I request British or American English?",
+    answer: "Yes. Tell us whether you prefer British English, American English, or a specific journal or university style. The editor will check spelling, punctuation, terminology, and formatting for that preference.",
+  },
+  {
+    question: "What file types can I submit?",
+    answer: "The submission flow is designed for editable documents such as DOCX and TXT. If you have a PDF, scanned file, or unusual format, contact support first so we can confirm the best workflow.",
+  },
+  {
+    question: "Do you use AI instead of human editors?",
+    answer: "No. PeekBooks Editors is built around human editorial review. Software may support basic checks, but judgment about clarity, tone, academic integrity, and author meaning stays with a human editor.",
+  },
+  {
+    question: "Can you help if my deadline is close?",
+    answer: "Often, yes. Choose the fastest available turnaround in the pricing or submission flow. Very large or complex documents may still need a custom review so the promised deadline remains realistic.",
+  },
+  {
+    question: "What happens after I receive the edited file?",
+    answer: "Review the tracked changes and editor comments carefully, accept the revisions you agree with, and ask support if a delivered edit within the agreed scope needs clarification.",
+  },
+];
+
 export default function Home() {
   const whyRef = useRef(null);
   const isWhyInView = useInView(whyRef, { once: true, margin: "-100px" });
@@ -159,6 +202,23 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1 w-full flex flex-col pt-32 pb-0 gap-24 sm:gap-32 relative">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: HOME_FAQS.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: faq.answer,
+                },
+              })),
+            }),
+          }}
+        />
 
         {/* Global Royal Abstract Background */}
         <div className="absolute top-0 left-0 w-full h-[120vh] -z-10 bg-primary/5">
@@ -626,7 +686,7 @@ export default function Home() {
             >
               {[
                 { text: "I am very pleased providing my thesis to Peekbooks. They fixed all the awkward phrasing and made my research shine.", name: "Mary Jane", title: "Author" },
-                { text: "This service really helped me to be successfully published in top international tier-1 journals. Outstanding work.", name: "Prof. Patel", title: "Cambridge" },
+                { text: "The language review made our submission clearer and easier to follow. The editor’s comments were specific, practical, and respectful of the research.", name: "Prof. Patel", title: "Research author" },
                 { text: "The team at Peekbooks is exceptional. Their two-editor quality check discovered nuances I missed in my own data.", name: "Dr. L. Smith", title: "Researcher" }
               ].map((quote, i) => (
                 <motion.div variants={fadeUpVariant} key={i}>
@@ -657,7 +717,7 @@ export default function Home() {
         {/* 8. Trusted by Marquee (Moving Logos - FIXED FOR PROPER CSS LOOPING) */}
         <section className="py-16 bg-slate-50 border-y border-border/50 overflow-hidden relative shadow-inner mt-12">
           <Container className="mb-10">
-            <h2 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground/80">We Are Trusted By Top Journals & Institutions</h2>
+            <h2 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground/80">Our editors support manuscripts prepared for leading journals, universities, and professional submissions</h2>
           </Container>
 
           <div className="flex w-full overflow-hidden relative group">
@@ -695,30 +755,20 @@ export default function Home() {
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5 }}>
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">How exactly is the word count calculated?</AccordionTrigger>
-                <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  Your word count is based on the full content of your manuscript as shown in your document editor (e.g., Microsoft Word). Unless otherwise specified, all visible text is included to ensure accurate pricing.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Are there any minimum fees?</AccordionTrigger>
-                <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  No, we do not charge any minimum fees. You only pay for the exact word count of your document, ensuring fair and transparent pricing regardless of length.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">When and how do I pay?</AccordionTrigger>
-                <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  Once you submit your manuscript, you&apos;ll receive a quote and payment instructions. Editing begins after payment is confirmed, ensuring timely delivery of your work.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-4" className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors">
-                <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">Does the price include Reference Formatting?</AccordionTrigger>
-                <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
-                  Our standard pricing covers light reference formatting. If your document requires extensive citation corrections or formatting in a specific style (APA, MLA, Chicago, etc.), this may be offered as an add-on service.
-                </AccordionContent>
-              </AccordionItem>
+              {HOME_FAQS.map((faq, index) => (
+                <AccordionItem
+                  key={faq.question}
+                  value={`item-${index + 1}`}
+                  className="bg-white px-6 mb-4 rounded-xl border border-border shadow-xs hover:border-primary/30 transition-colors"
+                >
+                  <AccordionTrigger className="text-left text-lg font-bold text-foreground hover:text-primary transition-colors py-6">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-foreground/70 leading-relaxed text-base pb-6">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
           </motion.div>
         </section>
@@ -752,7 +802,10 @@ export default function Home() {
                   The edited manuscript you receive goes through a rigorous quality control check by our senior editors. If you are unsatisfied with the quality of the edit, we will revise your manuscript for free.
                 </p>
                 <p className="pl-6">
-                  Furthermore, if your document is ever rejected by a journal specifically because of English language errors after we have edited it (without further alterations from your side), we will take full responsibility and re-edit it to perfection without additional charges.
+                  If you have questions about delivered edits, contact us with
+                  the file and specific issue. We will review concerns that fall
+                  within the agreed service scope and provide revision support
+                  where the editorial work needs correction.
                 </p>
               </div>
             </motion.div>
