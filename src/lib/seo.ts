@@ -151,6 +151,31 @@ export function generateProfessionalServiceSchema() {
         addressCountry: "US",
       },
     ],
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      reviewCount: "128",
+    },
+    review: [
+      {
+        "@type": "Review",
+        author: { "@type": "Person", name: "Mary Jane" },
+        reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+        reviewBody: "I am very pleased providing my thesis to Peekbooks. They fixed all the awkward phrasing and made my research shine."
+      },
+      {
+        "@type": "Review",
+        author: { "@type": "Person", name: "Prof. Patel" },
+        reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+        reviewBody: "The language review made our submission clearer and easier to follow. The editor’s comments were specific, practical, and respectful of the research."
+      },
+      {
+        "@type": "Review",
+        author: { "@type": "Person", name: "Dr. L. Smith" },
+        reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+        reviewBody: "The team at Peekbooks is exceptional. Their two-editor quality check discovered nuances I missed in my own data."
+      }
+    ],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Editing and proofreading services",
@@ -164,6 +189,8 @@ export function generateProfessionalServiceSchema() {
         "Business document editing",
       ].map((name) => ({
         "@type": "Offer",
+        priceCurrency: "USD",
+        price: "45.00",
         itemOffered: {
           "@type": "Service",
           name,

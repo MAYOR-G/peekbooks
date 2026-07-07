@@ -62,7 +62,7 @@ export default async function BlogPostPage({ params }: Props) {
     dateModified: new Date(post.updated).toISOString(),
     mainEntityOfPage: `${PRODUCTION_SITE_URL}/blog/${post.slug}`,
     author: {
-      "@type": "Organization",
+      "@type": "Person",
       name: post.author
     },
     publisher: {
