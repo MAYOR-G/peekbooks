@@ -1,7 +1,10 @@
+import { NEW_LEARNING_CENTER_POSTS } from "@/lib/new-learning-center-posts";
+
 export interface BlogPost {
   slug: string;
   title: string;
   seoTitle: string;
+  metaDescription?: string;
   excerpt: string;
   content: string;
   author: string;
@@ -11,12 +14,15 @@ export interface BlogPost {
   tags: string[];
   summary?: string[];
   faqs?: { question: string; answer: string }[];
+  heroImage?: string;
+  heroImageAlt?: string;
 }
 
 const author = "PeekBooks Editorial Team";
 const updated2026 = "2026-06-25";
 
 export const BLOG_POSTS: BlogPost[] = [
+  ...NEW_LEARNING_CENTER_POSTS,
   {
     slug: "dissertation-proofreading-checklist",
     title: "Dissertation Proofreading Checklist for Graduate Students",

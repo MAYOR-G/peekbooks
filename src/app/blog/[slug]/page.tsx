@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, User, Info, CheckCircle2, HelpCircle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Metadata } from "next";
 
 import { getBlogPostBySlug, getAllBlogPosts } from "@/lib/blog";
@@ -26,13 +27,21 @@ export async function generateMetadata(
 
   return buildPageMetadata({
     title: post.seoTitle,
-    description: post.excerpt,
+    description: post.metaDescription || post.excerpt,
     canonicalPath: `/blog/${post.slug}`,
     keywords: post.tags,
     openGraph: {
       type: "article",
       publishedTime: post.date,
       authors: [post.author],
+      images: post.heroImage ? [
+        {
+          url: post.heroImage,
+          width: 1536,
+          height: 864,
+          alt: post.heroImageAlt || post.title,
+        },
+      ] : undefined,
     },
   });
 }
@@ -73,6 +82,11 @@ export default async function BlogPostPage({ params }: Props) {
         url: `${PRODUCTION_SITE_URL}/icon.svg`,
       },
     },
+    image: post.heroImage ? {
+      "@type": "ImageObject",
+      url: `${PRODUCTION_SITE_URL}${post.heroImage}`,
+      caption: post.heroImageAlt || post.title,
+    } : undefined,
   };
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", path: "/" },
@@ -130,6 +144,19 @@ export default async function BlogPostPage({ params }: Props) {
                 {post.title}
               </h1>
             </header>
+
+            {post.heroImage ? (
+              <div className="relative mb-14 aspect-[16/9] overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                <Image
+                  src={post.heroImage}
+                  alt={post.heroImageAlt || post.title}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className="object-cover"
+                />
+              </div>
+            ) : null}
 
             {/* Premium Summary Box */}
             {post.summary && post.summary.length > 0 && (
