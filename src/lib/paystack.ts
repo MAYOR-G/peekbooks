@@ -1,4 +1,4 @@
-import { createHmac, randomUUID } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
 export interface PaystackVerificationData {
   status: string;
@@ -59,6 +59,7 @@ export async function initializePaystackTransaction({
       metadata,
     }),
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
 
   const payload = (await response.json()) as {
@@ -87,6 +88,7 @@ export async function verifyPaystackTransaction(reference: string) {
         Authorization: `Bearer ${secretKey}`,
       },
       cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
     },
   );
 
@@ -115,7 +117,13 @@ export function validatePaystackWebhookSignature(
     .update(rawBody)
     .digest("hex");
 
-  return digest === signatureHeader;
+  if (!/^[a-f0-9]{128}$/i.test(signatureHeader)) {
+    return false;
+  }
+
+  const digestBuffer = Buffer.from(digest, "hex");
+  const signatureBuffer = Buffer.from(signatureHeader, "hex");
+  return timingSafeEqual(digestBuffer, signatureBuffer);
 }
 
 function getPaystackSecretKey() {

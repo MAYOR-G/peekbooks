@@ -45,7 +45,7 @@ export default async function AdminPage() {
               Protected
             </span>
             <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-              Peekbooks Admin
+              PeekBooks Editors Admin
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Messages, manuscript submissions, payment status, and project tracking.
@@ -110,7 +110,7 @@ export default async function AdminPage() {
                             }`}
                           >
                             <div className={reply.direction === "admin" ? "mb-1 font-semibold text-white" : "mb-1 font-semibold"}>
-                              {reply.direction === "admin" ? "Peekbooks" : reply.senderName}
+                              {reply.direction === "admin" ? "PeekBooks Editors" : reply.senderName}
                             </div>
                             <p className="whitespace-pre-wrap">{reply.message}</p>
                             {reply.attachment ? (

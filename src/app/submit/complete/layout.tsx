@@ -3,7 +3,7 @@ import { buildPageMetadata } from "@/lib/seo";
 export const metadata = buildPageMetadata({
   title: "Submission Complete",
   description: "Confirmation page for completed manuscript submissions.",
-  canonicalPath: "/submit/complete",
+  canonicalPath: null,
   noindex: true,
 });
 

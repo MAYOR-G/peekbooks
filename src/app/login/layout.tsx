@@ -3,7 +3,7 @@ import { buildPageMetadata } from "@/lib/seo";
 export const metadata = buildPageMetadata({
   title: "Login",
   description: "Private login area.",
-  canonicalPath: "/login",
+  canonicalPath: null,
   noindex: true,
 });
 

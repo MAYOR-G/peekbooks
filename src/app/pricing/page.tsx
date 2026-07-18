@@ -441,7 +441,7 @@ export default function PricingPage() {
                     Why do large documents require custom review?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed text-base pt-2">
-                    Documents above 50,000 words can vary widely in scope, structure, and timeline. Peekbooks reviews those projects manually so the quote and schedule are realistic.
+                    Documents above 50,000 words can vary widely in scope, structure, and timeline. PeekBooks Editors reviews those projects manually so the quote and schedule are realistic. For a thesis that needs more than a final proofread, compare <Link href="/thesis-editing" className="font-semibold text-primary hover:underline">thesis editing</Link> before selecting a service.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-3">

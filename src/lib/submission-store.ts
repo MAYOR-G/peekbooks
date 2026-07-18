@@ -11,6 +11,8 @@ const FILESYSTEM_MANUSCRIPTS_DIR = path.join(FILESYSTEM_STORAGE_ROOT, "manuscrip
 const FILESYSTEM_SUBMISSIONS_DIR = path.join(FILESYSTEM_STORAGE_ROOT, "submissions");
 const BLOB_MANUSCRIPTS_PREFIX = "manuscripts";
 const BLOB_SUBMISSIONS_PREFIX = "submissions";
+const SUBMISSION_ID_PATTERN =
+  /^sub_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function ensureSubmissionStorage() {
   if (isBlobStorageEnabled()) {
@@ -18,8 +20,8 @@ export async function ensureSubmissionStorage() {
   }
 
   await Promise.all([
-    fs.mkdir(FILESYSTEM_MANUSCRIPTS_DIR, { recursive: true }),
-    fs.mkdir(FILESYSTEM_SUBMISSIONS_DIR, { recursive: true }),
+    fs.mkdir(FILESYSTEM_MANUSCRIPTS_DIR, { recursive: true, mode: 0o700 }),
+    fs.mkdir(FILESYSTEM_SUBMISSIONS_DIR, { recursive: true, mode: 0o700 }),
   ]);
 }
 
@@ -34,6 +36,7 @@ export async function persistUploadedFile({
   buffer: Buffer;
   mimeType: string;
 }) {
+  assertValidSubmissionId(submissionId);
   const safeName = sanitizeFileName(fileName);
   const storedFileName = `${submissionId}-${safeName}`;
 
@@ -57,7 +60,8 @@ export async function persistUploadedFile({
   await ensureSubmissionStorage();
 
   const storagePath = path.join(FILESYSTEM_MANUSCRIPTS_DIR, storedFileName);
-  await fs.writeFile(storagePath, buffer);
+  assertPathWithin(FILESYSTEM_MANUSCRIPTS_DIR, storagePath);
+  await fs.writeFile(storagePath, buffer, { mode: 0o600 });
 
   return {
     storedFileName,
@@ -68,6 +72,7 @@ export async function persistUploadedFile({
 }
 
 export async function saveSubmission(record: SubmissionRecord) {
+  assertValidSubmissionId(record.id);
   const normalizedRecord = normalizeSubmissionRecord(record);
   const payload = JSON.stringify(normalizedRecord, null, 2);
 
@@ -83,16 +88,19 @@ export async function saveSubmission(record: SubmissionRecord) {
 
   await ensureSubmissionStorage();
   const submissionPath = path.join(FILESYSTEM_SUBMISSIONS_DIR, `${normalizedRecord.id}.json`);
-  await fs.writeFile(submissionPath, payload, "utf8");
+  assertPathWithin(FILESYSTEM_SUBMISSIONS_DIR, submissionPath);
+  await fs.writeFile(submissionPath, payload, { encoding: "utf8", mode: 0o600 });
 }
 
 export async function readSubmission(submissionId: string) {
+  assertValidSubmissionId(submissionId);
   if (isBlobStorageEnabled()) {
     const file = await readBlobText(getSubmissionBlobPath(submissionId));
     return normalizeSubmissionRecord(JSON.parse(file) as SubmissionRecord);
   }
 
   const submissionPath = path.join(FILESYSTEM_SUBMISSIONS_DIR, `${submissionId}.json`);
+  assertPathWithin(FILESYSTEM_SUBMISSIONS_DIR, submissionPath);
   const file = await fs.readFile(submissionPath, "utf8");
   return normalizeSubmissionRecord(JSON.parse(file) as SubmissionRecord);
 }
@@ -133,10 +141,13 @@ export async function readSubmissionFile(record: SubmissionRecord) {
     return readBlobBuffer(normalizedRecord.manuscript.storagePath);
   }
 
-  return fs.readFile(normalizedRecord.manuscript.storagePath);
+  const storagePath = path.resolve(normalizedRecord.manuscript.storagePath);
+  assertPathWithin(FILESYSTEM_MANUSCRIPTS_DIR, storagePath);
+  return fs.readFile(storagePath);
 }
 
 export async function submissionExists(submissionId: string) {
+  assertValidSubmissionId(submissionId);
   if (isBlobStorageEnabled()) {
     try {
       await head(getSubmissionBlobPath(submissionId));
@@ -158,11 +169,18 @@ export function createDraftSubmissionId() {
   return `sub_${randomUUID()}`;
 }
 
+export function assertValidSubmissionId(submissionId: string) {
+  if (!SUBMISSION_ID_PATTERN.test(submissionId)) {
+    throw new Error("Invalid manuscript submission id.");
+  }
+}
+
 function isBlobStorageEnabled() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
 function getSubmissionBlobPath(submissionId: string) {
+  assertValidSubmissionId(submissionId);
   return `${BLOB_SUBMISSIONS_PREFIX}/${submissionId}.json`;
 }
 
@@ -199,6 +217,7 @@ function normalizeSubmissionRecord(record: SubmissionRecord) {
 
   return {
     ...record,
+    draftAccessTokenHash: record.draftAccessTokenHash ?? null,
     paymentStatus:
       record.paymentStatus ??
       (record.payment?.status === "success"
@@ -245,4 +264,16 @@ function sanitizeFileName(fileName: string) {
     .replace(/\s+/g, "-")
     .replace(/[^a-zA-Z0-9._-]/g, "")
     .toLowerCase();
+}
+
+function assertPathWithin(root: string, candidate: string) {
+  const resolvedRoot = path.resolve(root);
+  const resolvedCandidate = path.resolve(candidate);
+
+  if (
+    resolvedCandidate !== resolvedRoot &&
+    !resolvedCandidate.startsWith(`${resolvedRoot}${path.sep}`)
+  ) {
+    throw new Error("Resolved storage path is outside the configured directory.");
+  }
 }

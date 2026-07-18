@@ -19,6 +19,7 @@ const FOOTER_LINKS = [
 const SERVICE_LINKS = [
   { name: "Dissertation Proofreading", path: "/dissertation-proofreading" },
   { name: "Thesis Proofreading", path: "/thesis-proofreading" },
+  { name: "Thesis Editing", path: "/thesis-editing" },
   { name: "Academic Editing", path: "/academic-editing" },
   { name: "Manuscript Editing", path: "/manuscript-editing" },
   { name: "Journal Paper Editing", path: "/journal-paper-editing" },
@@ -55,7 +56,7 @@ export function Footer() {
             </div>
             <div className="flex flex-col">
               <span className="text-[1.15rem] font-extrabold leading-none tracking-[0.04em] text-white">
-                PEEKBOOKS
+                PeekBooks Editors
               </span>
               <span className="mt-1 max-w-[12rem] text-[0.58rem] font-semibold uppercase tracking-[0.1em] text-white/62 leading-tight">
                 Editing and Proofreading
@@ -169,7 +170,7 @@ export function Footer() {
 
         <div className="border-t border-white/12 pt-6 lg:col-span-4">
           <p className="text-sm text-white/62">
-            © {new Date().getFullYear()} Peekbooks Editing and Proofreading. All rights reserved.
+            © {new Date().getFullYear()} PeekBooks Editors. All rights reserved.
           </p>
         </div>
       </Container>

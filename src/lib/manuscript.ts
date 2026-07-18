@@ -5,22 +5,21 @@ import {
 } from "@/lib/submission-config";
 import {
   getFileExtension,
+  validateDocumentContent,
   validateSupportedDocument,
 } from "@/lib/file-validation";
 import type { AnalyzedManuscript } from "@/lib/submission-types";
 
 export async function analyzeManuscriptFile({
   fileName,
-  mimeType,
   sizeBytes,
   buffer,
 }: {
   fileName: string;
-  mimeType: string;
   sizeBytes: number;
   buffer: Buffer;
 }) {
-  validateManuscript(fileName, sizeBytes);
+  const trustedMimeType = validateManuscript(fileName, sizeBytes, buffer);
 
   const extension = getFileExtension(fileName);
   let textContent = "";
@@ -48,7 +47,7 @@ export async function analyzeManuscriptFile({
 
   const analysis: AnalyzedManuscript = {
     extension,
-    mimeType,
+    mimeType: trustedMimeType,
     sizeBytes,
     wordCount,
   };
@@ -56,8 +55,9 @@ export async function analyzeManuscriptFile({
   return analysis;
 }
 
-export function validateManuscript(fileName: string, sizeBytes: number) {
+export function validateManuscript(fileName: string, sizeBytes: number, buffer: Buffer) {
   validateSupportedDocument(fileName, sizeBytes);
+  return validateDocumentContent(fileName, buffer);
 }
 
 function extractRtfText(buffer: Buffer) {

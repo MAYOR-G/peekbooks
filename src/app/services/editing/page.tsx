@@ -9,6 +9,7 @@ import { Footer } from "@/components/layouts/footer";
 import { Container } from "@/components/layouts/container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { generateFAQSchema } from "@/lib/seo";
 
 const fadeUpVariant: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -93,6 +94,8 @@ const serviceFaqs = [
 ];
 
 export default function EditingServicesPage() {
+    const faqSchema = generateFAQSchema(serviceFaqs);
+
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
@@ -100,20 +103,7 @@ export default function EditingServicesPage() {
             <main className="flex-1 pt-24">
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            mainEntity: serviceFaqs.map((faq) => ({
-                                "@type": "Question",
-                                name: faq.question,
-                                acceptedAnswer: {
-                                    "@type": "Answer",
-                                    text: faq.answer
-                                }
-                            }))
-                        })
-                    }}
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
                 />
                 {/* Hero Section */}
                 <section className="bg-primary pt-20 pb-24 relative overflow-hidden">
@@ -160,7 +150,7 @@ export default function EditingServicesPage() {
                                 className="text-center mb-12"
                             >
                                 <h2 className="text-3xl font-serif font-bold text-foreground mb-4">What You Will Receive</h2>
-                                <p className="text-muted-foreground text-lg">Every manuscript edited by PEEKBOOKS includes these essential improvements.</p>
+                                <p className="text-muted-foreground text-lg">Every manuscript edited by PeekBooks Editors includes these essential improvements.</p>
                             </motion.div>
 
                             <motion.div
@@ -290,10 +280,10 @@ export default function EditingServicesPage() {
                             className="max-w-2xl mx-auto"
                         >
                             <h2 className="text-3xl font-serif font-bold text-white mb-6">
-                                Ready for Publication?
+                                Prepare Your Document
                             </h2>
                             <p className="text-slate-200 mb-8 text-lg">
-                                Join thousands of happy researchers and professionals globally who trust our services.
+                                Choose the editing scope that matches your draft, then submit one current file with clear instructions.
                             </p>
                             <Button size="lg" className="bg-white text-primary hover:bg-slate-100 min-w-[200px]" asChild>
                                 <Link href="/submit">Submit Your Manuscript</Link>
@@ -321,6 +311,7 @@ export default function EditingServicesPage() {
                                 {[
                                     ["Dissertation proofreading", "/dissertation-proofreading"],
                                     ["Thesis proofreading", "/thesis-proofreading"],
+                                    ["Thesis editing", "/thesis-editing"],
                                     ["Academic editing", "/academic-editing"],
                                     ["Journal paper editing", "/journal-paper-editing"],
                                     ["Business document editing", "/business-document-editing"],

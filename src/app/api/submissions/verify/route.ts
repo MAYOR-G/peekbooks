@@ -4,9 +4,8 @@ import { finalizeSubmissionFromReference } from "@/lib/submission-service";
 
 export const runtime = "nodejs";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const reference = searchParams.get("reference");
+export async function POST(request: Request) {
+  const { reference } = (await request.json()) as { reference?: string };
 
   if (!reference) {
     return NextResponse.json(
@@ -25,20 +24,15 @@ export async function GET(request: Request) {
       submission: {
         id: result.record.id,
         stage: result.record.stage,
-        customerName: result.record.customer?.fullName ?? "",
         wordCount: result.record.manuscript.wordCount,
-        fileName: result.record.manuscript.originalFileName,
         amount: result.record.pricing?.amount ?? 0,
         currency: result.record.pricing?.currency ?? "USD",
-        notifications: result.record.notifications,
       },
     });
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "We could not confirm this payment yet.";
-
-    return NextResponse.json({ error: message }, { status: 400 });
+  } catch {
+    return NextResponse.json(
+      { error: "We could not confirm this payment yet." },
+      { status: 400 },
+    );
   }
 }

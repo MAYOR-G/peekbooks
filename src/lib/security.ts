@@ -49,6 +49,10 @@ export async function verifyTurnstileToken({
   const secret = process.env.TURNSTILE_SECRET_KEY;
 
   if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new PublicError("The security check is temporarily unavailable.", 503);
+    }
+
     return { configured: false, success: true };
   }
 
@@ -67,6 +71,7 @@ export async function verifyTurnstileToken({
       method: "POST",
       body,
       cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
     },
   );
 
@@ -100,6 +105,23 @@ export function safeCompare(value: string, expected: string) {
   const valueHash = createHash("sha256").update(value).digest();
   const expectedHash = createHash("sha256").update(expected).digest();
   return timingSafeEqual(valueHash, expectedHash);
+}
+
+export function hashOpaqueToken(value: string) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+export function attachmentContentDisposition(fileName: string) {
+  const normalized = fileName.normalize("NFKC").replace(/[\r\n]/g, "").slice(0, 180);
+  const asciiFallback = normalized
+    .replace(/[^a-zA-Z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "") || "document";
+  const encoded = encodeURIComponent(normalized).replace(/[!'()*]/g, (character) =>
+    `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+
+  return `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encoded}`;
 }
 
 export function jsonError(error: unknown, fallback: string) {

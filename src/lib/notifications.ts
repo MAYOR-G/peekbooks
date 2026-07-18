@@ -1,4 +1,4 @@
-import { readSubmissionFile, saveSubmission } from "@/lib/submission-store";
+import { saveSubmission } from "@/lib/submission-store";
 import type { NotificationState, SubmissionRecord } from "@/lib/submission-types";
 import {
   formatCurrency,
@@ -13,9 +13,6 @@ export async function sendSubmissionNotifications(record: SubmissionRecord) {
     throw new Error("Submission is missing required data for notifications.");
   }
 
-  const manuscriptBuffer = await readSubmissionFile(record);
-  const attachmentContent = manuscriptBuffer.toString("base64");
-
   const customerSubmissionState = await sendIfNeeded(
     record,
     "customerSubmission",
@@ -29,7 +26,7 @@ export async function sendSubmissionNotifications(record: SubmissionRecord) {
 
   const customerPaymentState = await sendIfNeeded(record, "customerPayment", {
     to: [record.customer.email],
-      subject: "Your Peekbooks payment receipt",
+      subject: "Your PeekBooks Editors payment receipt",
     html: buildCustomerPaymentEmail(record),
     replyTo: getEditorEmail(),
   });
@@ -39,12 +36,6 @@ export async function sendSubmissionNotifications(record: SubmissionRecord) {
     subject: `New paid manuscript submission: ${record.customer.fullName}`,
     html: buildEditorNotificationEmail(record),
     replyTo: record.customer.email,
-    attachments: [
-      {
-        filename: record.manuscript.originalFileName,
-        content: attachmentContent,
-      },
-    ],
   });
 
   record.notifications.customerSubmission = customerSubmissionState;
@@ -68,7 +59,7 @@ export async function sendContactReceivedNotifications(thread: MessageThread) {
     to: [thread.senderEmail],
     subject: "We received your message",
     html: renderEmailLayout({
-      title: "Your message has reached Peekbooks Editing and Proofreading",
+      title: "Your message has reached PeekBooks Editors",
       intro: `Hello ${thread.senderName},`,
       body: "Thank you for contacting us. Our editorial team will review your message and reply as soon as possible.",
       items: [`Subject: ${thread.subject}`, `Reference: ${thread.id}`],
@@ -79,7 +70,7 @@ export async function sendContactReceivedNotifications(thread: MessageThread) {
 
   await sendEmail({
     to: [getEditorEmail()],
-    subject: `New Peekbooks contact message: ${thread.subject}`,
+    subject: `New PeekBooks Editors contact message: ${thread.subject}`,
     html: renderEmailLayout({
       title: "New contact message",
       intro: `${thread.senderName} sent a message through the website.`,
@@ -105,7 +96,7 @@ export async function sendAdminReplyEmail(thread: MessageThread, reply: MessageR
     to: [thread.senderEmail],
     subject: `Re: ${thread.subject}`,
     html: renderEmailLayout({
-      title: "A reply from Peekbooks Editing and Proofreading",
+      title: "A reply from PeekBooks Editors",
       intro: `Hello ${thread.senderName},`,
       body: reply.message,
       items: [`Subject: ${thread.subject}`],
@@ -236,7 +227,7 @@ function buildCustomerSubmissionEmail(record: SubmissionRecord) {
   return renderEmailLayout({
     title: "Your manuscript is safely in our queue",
     intro: `Hello ${record.customer?.fullName},`,
-    body: `This confirms that Peekbooks Editing and Proofreading has received your manuscript and payment. Our editorial team will review the brief and contact you shortly with the next step in the process.`,
+    body: `This confirms that PeekBooks Editors has received your manuscript and payment. Our editorial team will review the brief and contact you shortly with the next step in the process.`,
     items: [
       `Service: ${getServiceLabel(record)}`,
       `Turnaround: ${getTurnaroundLabel(record)}`,
@@ -270,7 +261,7 @@ function buildEditorNotificationEmail(record: SubmissionRecord) {
   return renderEmailLayout({
     title: "New paid manuscript submission",
     intro: "A customer has completed a manuscript submission and payment.",
-    body: "The manuscript file is attached to this email. Key details are below.",
+    body: "The manuscript is available through the protected admin dashboard. Key details are below.",
     items: [
       `Customer: ${record.customer?.fullName}`,
       `Email: ${record.customer?.email}`,
@@ -290,7 +281,7 @@ function buildEditorNotificationEmail(record: SubmissionRecord) {
       `Notes: ${record.brief?.notes || "No additional notes"}`,
     ],
     closing:
-      "Reply directly to the customer when you are ready to begin the editorial review.",
+      "Open the protected admin dashboard to retrieve the manuscript, then contact the customer when you are ready to begin the editorial review.",
   });
 }
 
@@ -318,7 +309,7 @@ function renderEmailLayout({
     <div style="font-family:Inter,Arial,sans-serif;background:#f8fafc;padding:32px;color:#0f172a;">
       <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
         <div style="padding:28px 32px;border-bottom:1px solid #e2e8f0;background:#eff6ff;">
-          <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#1d4ed8;font-weight:700;">Peekbooks Editing and Proofreading</div>
+          <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#1d4ed8;font-weight:700;">PeekBooks Editors</div>
           <h1 style="margin:12px 0 0;font-size:28px;line-height:1.2;font-family:'Times New Roman',serif;">${escapeHtml(title)}</h1>
         </div>
         <div style="padding:32px;">

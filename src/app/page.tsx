@@ -4,8 +4,7 @@ import { motion, Variants, useInView, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
   CheckCircle2, ShieldCheck, Clock, Award, UploadCloud, FileEdit,
-  Microscope, Globe2, BookOpen, Quote, Fingerprint, Activity,
-  Mountain, Cpu, Lightbulb, Hexagon, Compass, ArrowUpRight
+  Microscope, Globe2, BookOpen, Quote, Fingerprint, ArrowUpRight
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { EDITOR_FIELDS } from "@/lib/editor-fields";
+import { generateFAQSchema, generateOrganizationSchema, generateProfessionalServiceSchema, generateWebsiteSchema } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const staggerContainer: Variants = {
@@ -42,16 +42,6 @@ const foldRevealVariants: Variants = {
     transition: { delay: i * 0.15, type: "spring", stiffness: 100, damping: 20 }
   })
 };
-
-const LOGOS = [
-  { name: "Nature", icon: Mountain },
-  { name: "The Lancet", icon: Activity },
-  { name: "IEEE", icon: Cpu },
-  { name: "Elsevier", icon: Hexagon },
-  { name: "Oxford Press", icon: BookOpen },
-  { name: "Stanford Med", icon: Compass },
-  { name: "Science", icon: Lightbulb },
-];
 
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=82",
@@ -150,6 +140,12 @@ const HOME_FAQS = [
 ];
 
 export default function Home() {
+  const schemas = [
+    generateOrganizationSchema(),
+    generateWebsiteSchema(),
+    generateProfessionalServiceSchema(),
+    generateFAQSchema(HOME_FAQS),
+  ];
   const whyRef = useRef(null);
   const isWhyInView = useInView(whyRef, { once: true, margin: "-100px" });
 
@@ -202,23 +198,13 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1 w-full flex flex-col pt-32 pb-0 gap-24 sm:gap-32 relative">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: HOME_FAQS.map((faq) => ({
-                "@type": "Question",
-                name: faq.question,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: faq.answer,
-                },
-              })),
-            }),
-          }}
-        />
+        {schemas.map((schema, index) => (
+          <script
+            key={index}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          />
+        ))}
 
         {/* Global Royal Abstract Background */}
         <div className="absolute top-0 left-0 w-full h-[120vh] -z-10 bg-primary/5">
@@ -227,7 +213,7 @@ export default function Home() {
             alt="Royal Abstract Background"
             fill
             className="object-cover opacity-[0.15] mix-blend-multiply pointer-events-none"
-            priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/80 to-background" />
         </div>
@@ -237,7 +223,7 @@ export default function Home() {
           <Container className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
 
             <motion.div
-              initial="hidden"
+              initial={false}
               animate="visible"
               variants={staggerContainer}
               className="flex flex-col gap-6 max-w-2xl"
@@ -246,7 +232,7 @@ export default function Home() {
                 Professional proofreading, editing, and formatting for serious writing.
               </motion.h1>
               <motion.p variants={fadeUpVariant} className="text-lg text-foreground/80 leading-relaxed max-w-xl">
-                Peekbooks Editing and Proofreading helps researchers, authors, and professionals refine documents with human editorial care, clean formatting, and confidential handling.
+                PeekBooks Editors helps researchers, authors, and professionals refine documents with human editorial care, clean formatting, and a private submission workflow.
               </motion.p>
               <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button size="lg" asChild className="text-base h-14 px-8 shadow-lg hover:shadow-xl transition-all shadow-primary/20">
@@ -302,6 +288,7 @@ export default function Home() {
                     fill
                     className="object-cover"
                     priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -329,9 +316,9 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-16 opacity-90 mix-blend-luminosity">
               {[
                 { icon: ShieldCheck, text: "Ethical boundaries" },
-                { icon: CheckCircle2, text: "100% Confidential" },
+                { icon: CheckCircle2, text: "Private submission workflow" },
                 { icon: Award, text: "Tracked changes" },
-                { icon: Clock, text: "On-time delivery guaranteed" },
+                { icon: Clock, text: "Scope-based delivery dates" },
               ].map((item, i) => (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -360,7 +347,7 @@ export default function Home() {
               className="text-center space-y-4"
             >
               <h2 className="text-3xl sm:text-4xl font-bold font-serif tracking-tight text-primary">Our services at a glance</h2>
-              <p className="text-lg text-foreground/70 max-w-2xl mx-auto">Focused editorial services for authors who need clarity, polish, and publication-ready presentation.</p>
+              <p className="text-lg text-foreground/70 max-w-2xl mx-auto">Focused editorial services for authors who need clarity, polish, and professional presentation.</p>
             </motion.div>
 
             <div className="grid lg:grid-cols-12 gap-6">
@@ -488,8 +475,8 @@ export default function Home() {
                 {[
                   { step: "01", icon: UploadCloud, title: "Upload document", desc: "Share securely." },
                   { step: "02", icon: FileEdit, title: "Editing and proofreading", desc: "Expert assessment." },
-                  { step: "03", icon: ShieldCheck, title: "Quality check", desc: "Two-editor review." },
-                  { step: "04", icon: CheckCircle2, title: "Document delivered", desc: "Ready to publish." }
+                  { step: "03", icon: ShieldCheck, title: "Quality check", desc: "Review against the agreed scope." },
+                  { step: "04", icon: CheckCircle2, title: "Document delivered", desc: "Ready for author review." }
                 ].map((item, i) => (
                   <motion.div
                     key={item.step}
@@ -528,7 +515,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-4xl sm:text-5xl font-bold font-serif tracking-tight text-primary leading-tight"
               >
-                Why Authors choose <br /><span className="text-primary-hover">Peekbooks</span>
+                Why authors choose <br /><span className="text-primary-hover">PeekBooks Editors</span>
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -536,16 +523,16 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed"
               >
-                We do not compromise on quality. Our platform is distinguished by an elite roster of editors, an unyielding two-tier quality check, and guaranteed deadlines.
+                The document type, requested service, language preference, submission requirements, and available delivery window are reviewed before the project scope is confirmed.
               </motion.p>
             </div>
 
             <div className="flex-1 w-full grid sm:grid-cols-2 gap-6 relative sm:pl-10">
               {[
-                { icon: Fingerprint, title: "First-class English experts", desc: "Editors selected via rigorous testing." },
-                { icon: Globe2, title: "Native English editors", desc: "Fluent editors from the US, UK, Canada, & Australia." },
-                { icon: Microscope, title: "Two-editor QA system", desc: "Every document undergoes duplicate senior review." },
-                { icon: Clock, title: "Guaranteed on-time", desc: "We strictly adhere to deadlines, on-time, every time." },
+                { icon: Fingerprint, title: "Human editorial judgment", desc: "Language decisions are reviewed in the context of the whole document." },
+                { icon: Globe2, title: "British or American English", desc: "Authors can request a language variety or provide institution and journal instructions." },
+                { icon: Microscope, title: "Defined editorial scope", desc: "The service level and document requirements are confirmed before editing begins." },
+                { icon: Clock, title: "Realistic scheduling", desc: "Available delivery windows depend on word count, service level, and document condition." },
               ].map((pillar, i) => (
                 <motion.div
                   key={pillar.title}
@@ -579,7 +566,7 @@ export default function Home() {
           </Container>
         </section>
 
-        {/* 6. Expert editors from your field */}
+        {/* 6. Editorial support by document field */}
         <section className="relative overflow-hidden bg-[#f5f7fb] py-8 sm:py-10 lg:py-12">
           <div className="absolute inset-x-0 top-0 h-28 bg-[#17347f]" />
           <Container className="relative z-10 max-w-[1500px]">
@@ -597,9 +584,9 @@ export default function Home() {
                   <div className="absolute bottom-6 left-6 right-6 rounded-[24px] border border-white/18 bg-white/14 p-5 text-white backdrop-blur-md">
                     <div className="flex flex-wrap gap-3">
                       {[
-                        { value: `${EDITOR_FIELDS.length}+`, label: "Specialisms" },
-                        { value: "2-stage", label: "Quality review" },
-                        { value: "Human", label: "Editing" },
+                        { value: "Document", label: "Led scope" },
+                        { value: "Human", label: "Review" },
+                        { value: "Author", label: "Final control" },
                       ].map((item) => (
                         <div key={item.label} className="min-w-28">
                           <div className="font-serif text-2xl font-semibold">{item.value}</div>
@@ -619,10 +606,10 @@ export default function Home() {
                       Discipline-based matching
                     </div>
                     <h2 className="font-serif text-3xl font-semibold tracking-tight text-primary sm:text-[2.25rem] xl:text-[2.45rem]">
-                      Expert editors matched to the work in front of them.
+                      Editorial support matched to the work in front of it.
                     </h2>
                     <p className="text-sm leading-6 text-muted-foreground xl:text-base xl:leading-7">
-                      Instead of overwhelming visitors with a large wall of cards, Peekbooks groups editorial expertise by the type of judgement your document needs: academic precision, professional clarity, subject accuracy, and formatting discipline.
+                      PeekBooks Editors groups document fields by the type of editorial judgement the work may need: academic precision, professional clarity, terminology consistency, and formatting discipline. The team confirms whether the requested scope can be supported before work begins.
                     </p>
                   </div>
 
@@ -685,9 +672,9 @@ export default function Home() {
               className="grid md:grid-cols-3 gap-6"
             >
               {[
-                { text: "I am very pleased providing my thesis to Peekbooks. They fixed all the awkward phrasing and made my research shine.", name: "Mary Jane", title: "Author" },
+                { text: "I am very pleased providing my thesis to PeekBooks Editors. They fixed all the awkward phrasing and made my research shine.", name: "Mary Jane", title: "Author" },
                 { text: "The language review made our submission clearer and easier to follow. The editor’s comments were specific, practical, and respectful of the research.", name: "Prof. Patel", title: "Research author" },
-                { text: "The team at Peekbooks is exceptional. Their two-editor quality check discovered nuances I missed in my own data.", name: "Dr. L. Smith", title: "Researcher" }
+                { text: "The team at PeekBooks Editors is exceptional. Their two-editor quality check discovered nuances I missed in my own data.", name: "Dr. L. Smith", title: "Researcher" },
               ].map((quote, i) => (
                 <motion.div variants={fadeUpVariant} key={i}>
                   <Card className="h-full flex flex-col bg-white border-border hover:shadow-[0_20px_50px_-15px_rgba(30,58,138,0.15)] transition-all relative overflow-hidden rounded-2xl group cursor-default">
@@ -710,41 +697,10 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.div>
-
           </Container>
         </section>
 
-        {/* 8. Trusted by Marquee (Moving Logos - FIXED FOR PROPER CSS LOOPING) */}
-        <section className="py-16 bg-slate-50 border-y border-border/50 overflow-hidden relative shadow-inner mt-12">
-          <Container className="mb-10">
-            <h2 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground/80">Our editors support manuscripts prepared for leading journals, universities, and professional submissions</h2>
-          </Container>
-
-          <div className="flex w-full overflow-hidden relative group">
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-slate-50 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
-
-            <div className="flex shrink-0 min-w-full items-center justify-around gap-24 px-12 pause-on-hover animate-[marquee_35s_linear_infinite]">
-              {LOGOS.map((logo, i) => (
-                <div key={i} className="flex items-center gap-3 text-foreground/40 hover:text-primary transition-all duration-300 hover:scale-105 cursor-pointer select-none filter grayscale hover:grayscale-0">
-                  <logo.icon size={40} strokeWidth={1.5} />
-                  <span className="font-serif font-bold text-3xl whitespace-nowrap tracking-tight">{logo.name}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex shrink-0 min-w-full items-center justify-around gap-24 px-12 pause-on-hover animate-[marquee_35s_linear_infinite]" aria-hidden="true">
-              {LOGOS.map((logo, i) => (
-                <div key={i} className="flex items-center gap-3 text-foreground/40 hover:text-primary transition-all duration-300 hover:scale-105 cursor-pointer select-none filter grayscale hover:grayscale-0">
-                  <logo.icon size={40} strokeWidth={1.5} />
-                  <span className="font-serif font-bold text-3xl whitespace-nowrap tracking-tight">{logo.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 9. FAQ Preview */}
+        {/* 8. FAQ Preview */}
         <section className="bg-background max-w-3xl mx-auto w-full px-4 sm:px-6 pt-16 pb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }}
@@ -773,7 +729,7 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* 10. Guarantee Section */}
+        {/* 8. Quality support section */}
         <section className="bg-background pb-12 pt-16 mt-8">
           <Container className="max-w-5xl">
             <motion.div
@@ -791,38 +747,37 @@ export default function Home() {
                 <div className="bg-linear-to-br from-primary to-blue-900 p-1.5 rounded-full shadow-2xl relative z-10 transform -rotate-6 hover:rotate-0 transition-transform duration-500">
                   <div className="bg-white border-4 border-white border-dashed p-8 rounded-full flex flex-col items-center justify-center h-48 w-48 shadow-inner">
                     <ShieldCheck size={56} className="text-primary mb-2 stroke-[1.5]" />
-                    <span className="font-bold text-3xl font-serif text-primary text-center leading-none">100%<br /><span className="text-sm uppercase tracking-widest font-sans opacity-80 mt-1 block">Guarantee</span></span>
+                    <span className="font-bold text-3xl font-serif text-primary text-center leading-none">Scope<br /><span className="text-sm uppercase tracking-widest font-sans opacity-80 mt-1 block">Support</span></span>
                   </div>
                 </div>
               </div>
 
               <div className="flex-1 space-y-6 text-foreground/80 leading-relaxed text-lg relative z-10">
-                <h3 className="text-3xl sm:text-4xl font-bold text-primary font-serif mb-6 leading-tight">The Peekbooks <br />100% Satisfaction Guarantee</h3>
+                <h3 className="text-3xl sm:text-4xl font-bold text-primary font-serif mb-6 leading-tight">Questions and corrections after delivery</h3>
                 <p className="border-l-4 border-primary/30 pl-6 italic">
-                  The edited manuscript you receive goes through a rigorous quality control check by our senior editors. If you are unsatisfied with the quality of the edit, we will revise your manuscript for free.
+                  Review the tracked changes and editor comments before accepting revisions. Author decisions remain with you, especially where wording, evidence, or discipline-specific meaning needs confirmation.
                 </p>
                 <p className="pl-6">
                   If you have questions about delivered edits, contact us with
                   the file and specific issue. We will review concerns that fall
-                  within the agreed service scope and provide revision support
-                  where the editorial work needs correction.
+                  within the agreed service scope and explain or correct the
+                  editorial work where appropriate.
                 </p>
               </div>
             </motion.div>
           </Container>
         </section>
 
-        {/* 11. Art Integration & Final CTA */}
+        {/* 9. Art Integration & Final CTA */}
         <section className="relative mt-12 mx-4 sm:mx-8 mb-12 rounded-[2.5rem] overflow-hidden shadow-[0_30px_80px_-20px_rgba(30,58,138,0.5)] bg-primary">
           <Image
             src="/luxury-art.png"
             alt="Luxury Editorial Abstract"
             fill
             className="object-cover opacity-30 mix-blend-luminosity hover:scale-105 transition-transform duration-1000"
-            priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-linear-to-tr from-primary via-primary/90 to-blue-900/80 -z-0" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.1] mix-blend-overlay z-0"></div>
 
           <Container className="relative z-10 flex flex-col items-center gap-10 py-32 text-center text-white">
             <motion.div
@@ -830,11 +785,11 @@ export default function Home() {
               className="space-y-6 flex flex-col items-center"
             >
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-serif max-w-3xl leading-tight">
-                Join the authors and researchers using Peekbooks.
+                Prepare your document with PeekBooks Editors.
               </h2>
               <div className="flex items-center gap-2 text-primary-light/90 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md">
                 <ShieldCheck size={18} />
-                <span className="text-sm uppercase tracking-widest font-bold">100% Confidential & Ethical</span>
+                <span className="text-sm uppercase tracking-widest font-bold">Private submission and clear editorial boundaries</span>
               </div>
             </motion.div>
 

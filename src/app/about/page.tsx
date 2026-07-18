@@ -34,7 +34,6 @@ export default function AboutPage() {
 
       <main className="flex-1 w-full pt-20">
         <section className="relative overflow-hidden border-b border-white/10 bg-primary pb-20 pt-24">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
           <div className="absolute right-0 top-0 h-full w-1/2 rounded-bl-full bg-linear-to-bl from-white/5 to-transparent blur-3xl pointer-events-none" />
 
           <Container className="relative z-10 flex flex-col items-center text-center sm:items-start sm:text-left">
@@ -96,7 +95,7 @@ export default function AboutPage() {
                   variants={fadeUpVariant}
                   className="text-lg font-medium leading-relaxed text-foreground/80"
                 >
-                  PEEKBOOKS supports authors, researchers, students, and
+                  PeekBooks Editors supports authors, researchers, students, and
                   professionals who need careful human editing before submission.
                   Our editors work on manuscripts prepared for universities,
                   journals, publishers, institutions, businesses, and professional
@@ -118,7 +117,7 @@ export default function AboutPage() {
                   variants={fadeUpVariant}
                   className="text-lg leading-relaxed text-foreground/80"
                 >
-                  PEEKBOOKS Editing Services promotes all principles of ethical
+                  PeekBooks Editors promotes all principles of ethical
                   publishing and encourages authors by offering services and
                   support that are relevant and appropriate to the highest
                   academic guidelines.
@@ -148,7 +147,7 @@ export default function AboutPage() {
                 variants={fadeUpVariant}
                 className="mx-auto max-w-3xl text-xl italic leading-relaxed text-foreground/80"
               >
-                &quot;At PEEKBOOKS editing services, we take pride in delivering
+                &quot;At PeekBooks Editors, we take pride in delivering
                 high-quality English editing and proofreading for every document,
                 whether it is academic, business, application, or bestseller. Our
                 editors combine years of experience in every order with
@@ -178,7 +177,7 @@ export default function AboutPage() {
                 className="mx-auto max-w-4xl rounded-3xl border border-border/50 bg-white p-8 shadow-xs sm:p-12 md:p-16"
               >
                 <p className="text-lg leading-relaxed text-foreground/80 sm:text-xl">
-                  Each editor at PEEKBOOKS&apos;s services is selected for strong
+                  Each editor working with PeekBooks Editors is selected for strong
                   language judgment, document sensitivity, and relevant subject
                   familiarity.
                   <strong className="font-semibold text-foreground">
@@ -229,7 +228,7 @@ export default function AboutPage() {
                     variants={fadeUpVariant}
                     className="text-lg font-medium leading-relaxed text-white/90 drop-shadow-md sm:text-xl"
                   >
-                    At PEEKBOOKS editing services, our editors are carefully
+                    At PeekBooks Editors, our editors are carefully
                     screened to ensure their editing skills are exceptional. Each
                     of them has years of writing and publishing experience.
                   </motion.p>

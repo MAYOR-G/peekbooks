@@ -21,7 +21,7 @@ export default async function BlogIndexPage() {
           <Container className="relative z-10 flex flex-col items-center text-center sm:items-start sm:text-left">
             <div className="max-w-4xl space-y-4">
               <h1 className="font-serif text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-                The Peekbooks Blog
+                The PeekBooks Editors Blog
               </h1>
               <p className="max-w-2xl text-lg font-medium leading-snug text-white/80 sm:text-xl md:text-2xl">
                 Insights and guides to elevate your writing and publishing journey.

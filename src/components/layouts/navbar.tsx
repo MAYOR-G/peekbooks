@@ -25,6 +25,7 @@ const NAV_LINKS: NavLink[] = [
         items: [
             { name: "Academic & Non-Academic Editing", path: "/services/editing" },
             { name: "Dissertation Proofreading", path: "/dissertation-proofreading" },
+            { name: "Thesis Editing", path: "/thesis-editing" },
             { name: "Academic Editing", path: "/academic-editing" },
             { name: "Journal Paper Editing", path: "/journal-paper-editing" },
             { name: "Business Document Editing", path: "/business-document-editing" },

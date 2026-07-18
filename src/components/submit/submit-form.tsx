@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import {
   AlertCircle,
   ArrowUpRight,
@@ -48,6 +49,7 @@ type StepId = (typeof STEPS)[number]["id"];
 
 interface ManuscriptAnalysis {
   submissionId: string;
+  draftToken: string;
   manuscript: {
     fileName: string;
     extension: string;
@@ -176,6 +178,7 @@ export function SubmitForm() {
       const payload = (await response.json()) as
         | {
             submissionId: string;
+            draftToken: string;
             manuscript: ManuscriptAnalysis["manuscript"];
             currency: string;
           }
@@ -218,6 +221,11 @@ export function SubmitForm() {
     if (currentStep === 2) {
       if (!selectedFile) {
         setSurfaceError("Please upload your manuscript before continuing.");
+        return;
+      }
+
+      if (TURNSTILE_SITE_KEY && !turnstileToken) {
+        setSurfaceError("Please complete the security check before the manuscript is uploaded.");
         return;
       }
 
@@ -269,6 +277,7 @@ export function SubmitForm() {
         },
         body: JSON.stringify({
           submissionId: analysis.submissionId,
+          draftToken: analysis.draftToken,
           fullName: form.fullName,
           email: form.email,
           institution: form.institution,
@@ -288,7 +297,6 @@ export function SubmitForm() {
               : form.serviceDetails,
           finalWordCount: getFinalWordCount(form, analysis),
           wordCountAdjustmentNote: form.wordCountAdjustmentNote,
-          turnstileToken,
         }),
       });
 
@@ -310,8 +318,8 @@ export function SubmitForm() {
       setSurfaceSuccess(
         payload.message ||
           (payload.customReview
-            ? "Your manuscript was submitted for custom review. Peekbooks will confirm timeline and pricing."
-            : "Your manuscript was submitted. Peekbooks will follow up with payment next steps."),
+            ? "Your manuscript was submitted for custom review. PeekBooks Editors will confirm timeline and pricing."
+            : "Your manuscript was submitted. PeekBooks Editors will follow up with payment next steps."),
       );
       setRedirectingToPaystack(false);
     } catch (error) {
@@ -341,7 +349,7 @@ export function SubmitForm() {
                   </h1>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
                     A clean four-step submission flow with automatic word-count
-                    detection, transparent pricing, and secure Paystack checkout.
+                    detection, transparent pricing, and secure Paystack checkout. Unsure whether a thesis needs deeper language work? Review <Link href="/thesis-editing" className="font-semibold text-primary hover:underline">thesis editing</Link> first.
                   </p>
                 </div>
               </div>
@@ -588,6 +596,8 @@ export function SubmitForm() {
                         </div>
                       </div>
                     ) : null}
+
+                    <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={setTurnstileToken} />
                   </div>
                 ) : null}
 
@@ -967,7 +977,6 @@ export function SubmitForm() {
                       </span>
                     </label>
 
-                    <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={setTurnstileToken} />
                   </div>
                 ) : null}
               </motion.div>

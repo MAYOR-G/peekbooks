@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
+import { randomBytes } from "node:crypto";
 
 import { analyzeManuscriptFile } from "@/lib/manuscript";
 import { SITE_CURRENCY } from "@/lib/submission-config";
 import {
   assertRateLimit,
   getClientIp,
+  hashOpaqueToken,
   jsonError,
+  verifyTurnstileToken,
 } from "@/lib/security";
 import {
   createDraftSubmissionId,
@@ -29,6 +32,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
+    await verifyTurnstileToken({
+      token: String(formData.get("turnstileToken") ?? ""),
+      ip,
+    });
+
     if (!(file instanceof File)) {
       return NextResponse.json(
         { error: "Please choose a manuscript file to continue." },
@@ -39,12 +47,12 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const analysis = await analyzeManuscriptFile({
       fileName: file.name,
-      mimeType: file.type || "application/octet-stream",
       sizeBytes: file.size,
       buffer,
     });
 
     const submissionId = createDraftSubmissionId();
+    const draftToken = randomBytes(32).toString("hex");
     const persistedFile = await persistUploadedFile({
       submissionId,
       fileName: file.name,
@@ -54,6 +62,7 @@ export async function POST(request: Request) {
 
     const draftRecord: SubmissionRecord = {
       id: submissionId,
+      draftAccessTokenHash: hashOpaqueToken(draftToken),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       stage: "draft",
@@ -89,6 +98,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       submissionId,
+      draftToken,
       currency: SITE_CURRENCY,
       manuscript: {
         fileName: draftRecord.manuscript.originalFileName,

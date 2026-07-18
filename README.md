@@ -1,4 +1,4 @@
-# PeekBooks
+# PeekBooks Editors
 
 Premium editorial website built with Next.js.
 
@@ -31,7 +31,7 @@ PAYSTACK_CURRENCY=NGN
 NEXT_PUBLIC_SITE_CURRENCY=NGN
 USD_TO_NGN_RATE=1500
 RESEND_API_KEY=re_your_resend_api_key
-RESEND_FROM_EMAIL=PeekBooks <submissions@yourdomain.com>
+RESEND_FROM_EMAIL=PeekBooks Editors <submissions@yourdomain.com>
 EDITOR_NOTIFICATION_EMAIL=editor@yourdomain.com
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_your_blob_token
 ```
@@ -69,7 +69,23 @@ Resend sends:
 
 - customer submission confirmation
 - customer payment receipt email
-- editor notification email with manuscript attachment and metadata
+- editor notification email with project metadata; manuscript files are retrieved through the protected admin dashboard
+
+## SEO verification and IndexNow
+
+After building and starting the production server locally, run the regression crawl against it:
+
+```bash
+npm run seo:check -- http://127.0.0.1:3000
+```
+
+After a production deployment, submit only newly published or materially changed public URLs to IndexNow:
+
+```bash
+npm run indexnow -- /thesis-editing /blog/how-long-does-thesis-proofreading-take
+```
+
+Do not use the IndexNow command for unchanged URLs. Verify that the key file is live before the first submission.
 
 ## Supported upload formats
 

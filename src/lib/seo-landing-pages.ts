@@ -42,7 +42,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     slug: "dissertation-proofreading",
     title: "Dissertation Proofreading Services",
     metaTitle: "Dissertation Proofreading Services for Graduate Students",
-    metaDescription: "Professional dissertation proofreading for grammar, formatting, citations, consistency, and final submission confidence. Get a secure quote today.",
+    metaDescription: "Dissertation proofreading for grammar, headings, references, tables, figures, cross-references and university formatting, with tracked changes where applicable.",
     keywords: ["dissertation proofreading", "dissertation proofreading services", "PhD proofreading", "graduate proofreading"],
     audience: "PhD, DBA, EdD, master’s, and graduate students preparing a final dissertation for supervisor, committee, or university submission.",
     intro: "Dissertation proofreading is the final quality review before submission. PeekBooks Editors checks grammar, punctuation, spelling, consistency, headings, tables, citations, and formatting details so your research is presented cleanly and professionally.",
@@ -63,6 +63,30 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
         heading: "Academic integrity and author control",
         body: "Your editor improves presentation and readability while preserving your voice and research contribution. We do not write new research, invent citations, or alter findings. Where a sentence is unclear, the editor can suggest a clearer wording or leave a comment for your decision.",
       },
+      {
+        heading: "When a dissertation is ready for proofreading",
+        body: "Proofreading is most efficient after the argument, chapter order, supervisor revisions, tables, figures, appendices, and reference list are stable. If chapters still need substantial restructuring, paragraph development, or rewriting for clarity, choose editing before the final proofread.",
+      },
+      {
+        heading: "Consistency across a long dissertation",
+        body: "The review can check grammar, spelling, punctuation, capitalization, abbreviations, tense, terminology, headings, numbering, captions, and cross-references across chapters. British or American English preferences and supplied graduate-school rules are applied consistently rather than guessed.",
+      },
+      {
+        heading: "Front matter, tables, figures, and appendices",
+        body: "A final dissertation check can include the title page, abstract, contents lists, lists of tables and figures, chapter headings, captions, footnotes, appendices, and visible links between the main text and supporting material. Editors flag missing or inconsistent items for the author to resolve.",
+      },
+      {
+        heading: "Citations and reference-list consistency",
+        body: "Editors can check visible consistency between in-text citations and the reference list, names, dates, punctuation, capitalization, and the supplied referencing style. They do not verify the truth of sources, invent missing references, or guarantee that every bibliographic record is complete unless a separate reference-checking scope is agreed.",
+      },
+      {
+        heading: "Tracked changes and what happens after delivery",
+        body: "Where the file format supports it, edits are returned with tracked changes and comments. The author should allow time to accept or reject revisions, answer comments, update cross-references after changes, and inspect the final exported file before submission.",
+      },
+      {
+        heading: "Turnaround, pricing, and what to upload",
+        body: "Timing and price depend on the final word count, service level, document condition, tables and figures, formatting or reference work, specialist material, and the available delivery window. Upload the stable manuscript, university instructions, preferred English variety, deadline, and any supervisor comments that affect the agreed scope.",
+      },
     ],
     faqs: [
       ...academicFaqs,
@@ -80,13 +104,14 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     relatedPosts: [
       { label: "Dissertation Proofreading Checklist", href: "/blog/dissertation-proofreading-checklist" },
       { label: "Academic Proofreading Cost in 2026", href: "/blog/academic-proofreading-cost-2026" },
+      { label: "How Long Thesis Proofreading Takes", href: "/blog/how-long-does-thesis-proofreading-take" },
     ],
   },
   {
     slug: "thesis-proofreading",
     title: "Thesis Proofreading Services",
     metaTitle: "Thesis Proofreading Services for Master’s and PhD Work",
-    metaDescription: "Human thesis proofreading for grammar, formatting, citations, clarity, and consistency. Prepare your thesis for confident submission.",
+    metaDescription: "Final-stage thesis proofreading for Master’s and PhD work, covering language, long-document consistency, references, tables, figures and British or American English.",
     keywords: ["thesis proofreading", "thesis proofreading service", "master thesis proofreading", "PhD thesis proofreading"],
     audience: "Master’s and doctoral students who need a careful final review before submitting their thesis.",
     intro: "Thesis proofreading helps remove avoidable language and formatting errors before your work reaches supervisors, examiners, or a graduate school office. PeekBooks Editors provides human review for clarity, consistency, grammar, and academic presentation.",
@@ -107,6 +132,22 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
         heading: "Style guide support",
         body: "Editors can work with APA, MLA, Chicago, Harvard, Vancouver, or university-specific requirements when you provide the relevant instructions. The review focuses on consistency and clean presentation rather than changing scholarly substance.",
       },
+      {
+        heading: "Final-stage proofreading for Master’s and doctoral theses",
+        body: "A thesis is ready for proofreading when its research question, evidence, chapter sequence, supervisor revisions, and core conclusions are settled. The proofread then concentrates on language accuracy and final-document consistency rather than developing the argument.",
+      },
+      {
+        heading: "Long-document consistency and thesis cross-references",
+        body: "The review can track terminology, abbreviations, tense, capitalization, headings, numbering, table and figure labels, equation presentation, citations, bibliography style, and references between chapters and appendices. Authors remain responsible for checking data, equations, and the final correctness of every cross-reference.",
+      },
+      {
+        heading: "Supervisor and graduate-school requirements",
+        body: "Provide the current graduate-school template, supervisor comments, style guide, submission checklist, and required English variety. Institution instructions take priority over a general preference for British or American English.",
+      },
+      {
+        heading: "Author review, scheduling, and service boundaries",
+        body: "Plan a separate author-review period after delivery so you can evaluate tracked changes, answer comments, and check the final file. Proofreading does not write research, restructure an unfinished thesis, alter data, guarantee an examination result, or replace supervisor approval. If the language still needs paragraph- or chapter-level work, thesis editing should come first.",
+      },
     ],
     faqs: [
       ...academicFaqs,
@@ -117,20 +158,88 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     ],
     relatedServices: [
       { label: "Dissertation proofreading", href: "/dissertation-proofreading" },
-      { label: "Academic editing", href: "/academic-editing" },
+      { label: "Thesis editing", href: "/thesis-editing" },
       { label: "Editing services", href: "/services/editing" },
+      { label: "Pricing", href: "/pricing" },
       { label: "Submit manuscript", href: "/submit" },
     ],
     relatedPosts: [
       { label: "Thesis Editing vs Proofreading", href: "/blog/thesis-editing-vs-proofreading" },
-      { label: "Research Paper Mistakes", href: "/blog/research-paper-grammar-formatting-mistakes" },
+      { label: "How Long Thesis Proofreading Takes", href: "/blog/how-long-does-thesis-proofreading-take" },
+      { label: "British vs American English", href: "/blog/british-vs-american-english-thesis-journal" },
+    ],
+  },
+  {
+    slug: "thesis-editing",
+    title: "Thesis Editing Services",
+    metaTitle: "Thesis Editing Services for Master’s and PhD Research",
+    metaDescription: "Thesis editing for sentence clarity, paragraph flow, academic tone and chapter consistency while preserving the author’s argument and research decisions.",
+    keywords: ["thesis editing", "thesis editing services", "thesis editor", "edit my thesis"],
+    audience: "Master’s and doctoral researchers whose thesis content is substantially drafted but still needs sentence-, paragraph-, and chapter-level clarity work before final proofreading.",
+    intro: "Thesis editing improves how an established research argument is communicated. PeekBooks Editors works on sentence clarity, paragraph flow, academic tone, repetition, transitions, and consistency while preserving the author’s evidence, voice, and scholarly decisions.",
+    benefits: [
+      "Clearer sentences and paragraphs without replacing the author’s argument.",
+      "Stronger transitions and more consistent terminology across chapters.",
+      "Comments where evidence, meaning, or structure requires an author decision.",
+      "Tracked changes where the document format supports them.",
+    ],
+    process: sharedProcess,
+    whoFor: ["Master’s thesis authors", "Doctoral researchers", "Multilingual authors writing in English", "Authors responding to supervisor comments before final proofreading"],
+    sections: [
+      {
+        heading: "Thesis editing versus thesis proofreading",
+        body: "Editing is appropriate when sentences, paragraph flow, repetition, academic tone, or chapter transitions still impede the reader. Proofreading is a later, narrower check for grammar, punctuation, spelling, formatting, and consistency after the writing is stable. Some theses need editing first and a separate final proofread after author revisions.",
+      },
+      {
+        heading: "Sentence-level editing and paragraph flow",
+        body: "An editor can clarify long or ambiguous sentences, reduce unnecessary repetition, improve transitions, and help each paragraph establish one clear purpose. Changes should make the reasoning easier to follow without adding claims or evidence that the thesis has not established.",
+      },
+      {
+        heading: "Alignment across thesis chapters",
+        body: "The review can compare the abstract and introduction with the stated aims, help the literature review maintain a clear line of discussion, improve methodology presentation, and make results and discussion sections easier to read. Comments flag mismatches or gaps that require the author’s scholarly judgment.",
+      },
+      {
+        heading: "Academic tone, terminology, and repetition",
+        body: "Editing can replace vague or inflated wording with precise academic language, unify terminology and abbreviations, and reduce repeated explanations across chapters. Discipline-specific terms are retained when they carry necessary meaning.",
+      },
+      {
+        heading: "Author decisions, Track Changes, and academic integrity",
+        body: "Where possible, revisions are delivered with Track Changes so the author can accept, reject, or adapt them. Editors may comment on unclear logic or missing context, but they do not invent arguments, fabricate citations, rewrite research as their own, alter data, or promise examiner approval, grades, or publication.",
+      },
+      {
+        heading: "How pricing and turnaround are determined",
+        body: "The quote and schedule depend on final word count, the level of language intervention, document condition, technical material, tables and figures, formatting or reference work, and the delivery window available. Upload a representative, stable draft plus supervisor or institution instructions so the scope can be confirmed accurately.",
+      },
+    ],
+    faqs: [
+      ...academicFaqs,
+      {
+        question: "Can thesis editing preserve my voice?",
+        answer: "Yes. The editor’s role is to clarify the writing while preserving the author’s meaning and research contribution. Track Changes and comments allow you to review every important decision.",
+      },
+      {
+        question: "Should proofreading happen after thesis editing?",
+        answer: "Usually, yes. After you review the edits and make any final content changes, a separate proofread can check the stable document for remaining language and formatting errors.",
+      },
+    ],
+    relatedServices: [
+      { label: "Thesis proofreading", href: "/thesis-proofreading" },
+      { label: "Dissertation proofreading", href: "/dissertation-proofreading" },
+      { label: "Academic editing", href: "/academic-editing" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Submit manuscript", href: "/submit" },
+    ],
+    relatedPosts: [
+      { label: "Thesis Editing vs Proofreading", href: "/blog/thesis-editing-vs-proofreading" },
+      { label: "How Long Thesis Proofreading Takes", href: "/blog/how-long-does-thesis-proofreading-take" },
+      { label: "British vs American English", href: "/blog/british-vs-american-english-thesis-journal" },
     ],
   },
   {
     slug: "academic-editing",
     title: "Academic Editing Services",
-    metaTitle: "Academic Editing Services for Research Papers and Theses",
-    metaDescription: "Academic editing for theses, dissertations, journal papers, and research manuscripts. Improve clarity, structure, tone, and readability.",
+    metaTitle: "Academic Editing Services for Research Papers",
+    metaDescription: "Academic paper editing for sentence clarity, paragraph flow, research-section readability, terminology and academic tone, with tracked changes where applicable.",
     keywords: ["academic editing", "academic editing services", "research paper editing", "English academic editing"],
     audience: "Researchers, postgraduate students, academics, and international authors preparing scholarly documents in English.",
     intro: "Academic editing improves how your research is communicated. PeekBooks Editors focuses on clarity, flow, sentence structure, terminology consistency, tone, and reader comprehension while protecting your meaning and academic integrity.",
@@ -141,7 +250,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       "Editorial comments that flag unclear claims, missing context, or author decisions.",
     ],
     process: sharedProcess,
-    whoFor: ["Journal authors", "Graduate students", "University researchers", "ESL academics", "Grant and proposal writers"],
+    whoFor: ["Research-paper authors", "Postgraduate students", "University researchers", "Multilingual academics", "Grant and proposal writers"],
     sections: [
       {
         heading: "What academic editing improves",
@@ -150,6 +259,26 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: "Human editing for scholarly work",
         body: "Every project is reviewed by a human editor. Automated tools can catch surface errors, but scholarly writing often needs judgment about tone, emphasis, discipline conventions, and whether a revision preserves the author’s intended meaning.",
+      },
+      {
+        heading: "Documents covered by academic editing",
+        body: "Suitable documents include research papers, coursework, proposals, reports, conference papers, grant text, literature reviews, and academic chapters. Dedicated thesis and journal-paper services are available when the document needs thesis-specific continuity or target-journal preparation.",
+      },
+      {
+        heading: "Research-paper sections and paragraph structure",
+        body: "Editing can improve the readability of abstracts, introductions, literature reviews, methods, results, discussions, and conclusions. The editor checks whether sentences and paragraphs communicate the author’s intended relationship between purpose, evidence, interpretation, and limitations without changing the research itself.",
+      },
+      {
+        heading: "Terminology and multilingual-author support",
+        body: "The review can make English phrasing more natural, maintain discipline terminology, reduce ambiguous pronouns, and unify abbreviations, tense, and key terms. The author’s supplied glossary, institutional rules, or target-reader expectations guide decisions where several phrasings are possible.",
+      },
+      {
+        heading: "Comments, tracked changes, and requirements",
+        body: "Where possible, edits are shown with tracked changes and comments. Provide the style guide, assessment instructions, supervisor notes, or journal requirements that affect the scope. Comments identify places where only the author can confirm evidence, meaning, or disciplinary accuracy.",
+      },
+      {
+        heading: "What an academic editor will not do",
+        body: "Academic editing does not write assessed work for the author, create results, invent sources, fabricate arguments, alter data, hide plagiarism, or guarantee grades, publication, journal acceptance, or supervisor approval.",
       },
     ],
     faqs: [
@@ -161,6 +290,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     ],
     relatedServices: [
       { label: "Journal paper editing", href: "/journal-paper-editing" },
+      { label: "Thesis editing", href: "/thesis-editing" },
       { label: "Dissertation proofreading", href: "/dissertation-proofreading" },
       { label: "Pricing", href: "/pricing" },
       { label: "Contact", href: "/contact" },
@@ -168,15 +298,16 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     relatedPosts: [
       { label: "How Editing Improves Clarity", href: "/blog/professional-editing-clarity-structure-readability" },
       { label: "Journal Manuscript Editing", href: "/blog/journal-manuscript-editing-submission" },
+      { label: "British vs American English", href: "/blog/british-vs-american-english-thesis-journal" },
     ],
   },
   {
     slug: "manuscript-editing",
-    title: "Manuscript Editing Services",
-    metaTitle: "Manuscript Editing Services for Authors and Researchers",
-    metaDescription: "Professional manuscript editing for academic papers, books, reports, and professional documents. Improve clarity, structure, and readiness.",
+    title: "Book and Professional Manuscript Editing Services",
+    metaTitle: "Book and Professional Manuscript Editing Services",
+    metaDescription: "Professional manuscript editing for books, reports and long-form author documents, covering clarity, voice, flow, consistency and publication preparation.",
     keywords: ["manuscript editing", "manuscript editing services", "professional manuscript editor", "book manuscript editing"],
-    audience: "Researchers, authors, professionals, and organizations preparing manuscripts for publication, submission, or review.",
+    audience: "Book authors, nonfiction writers, professionals, and organizations preparing long-form manuscripts for publication, stakeholder review, or professional use.",
     intro: "Manuscript editing helps a draft become clearer, more consistent, and easier to read. PeekBooks Editors reviews sentence structure, flow, tone, grammar, consistency, and presentation while preserving the author’s intent.",
     benefits: [
       "Sharper sentences and smoother transitions.",
@@ -185,15 +316,23 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       "A professional editorial pass before submission, publication, or stakeholder review.",
     ],
     process: sharedProcess,
-    whoFor: ["Academic authors", "Independent authors", "Business writers", "Nonfiction writers", "Researchers preparing manuscripts for journals"],
+    whoFor: ["Book authors", "Independent authors", "Business and policy writers", "Nonfiction writers", "Organizations preparing long-form publications"],
     sections: [
       {
         heading: "Manuscript editing for different document types",
-        body: "The right edit depends on the manuscript. A journal paper may need concise technical language, a book manuscript may need rhythm and consistency, and a business report may need directness and executive readability.",
+        body: "The right edit depends on the manuscript. A nonfiction book may need voice and long-range consistency, an author manuscript may need smoother narrative flow, and a professional report may need directness and executive readability. Scholarly journal articles belong on the dedicated journal-paper editing service.",
       },
       {
         heading: "Tracked changes and author review",
         body: "Where possible, edits are delivered with tracked changes so you can accept, reject, and understand revisions. Comments are used for unclear meaning, missing context, or choices that should remain with the author.",
+      },
+      {
+        heading: "Long-form consistency and author voice",
+        body: "A manuscript edit can check names, terminology, capitalization, chronology, headings, tone, and repeated ideas across a long document. Revisions aim to make the work coherent while preserving the author’s voice and intended audience.",
+      },
+      {
+        heading: "What manuscript editing does not promise",
+        body: "The service does not guarantee publication, publisher interest, sales, reviews, or reader response. Editors do not invent facts, write unsupported material, or replace the author’s responsibility for permissions, citations, legal review, and final publication decisions.",
       },
     ],
     faqs: [
@@ -224,7 +363,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
   {
     slug: "journal-paper-editing",
     title: "Journal Paper Editing Services",
-    metaTitle: "Journal Paper Editing Services Before Submission",
+    metaTitle: "Journal Paper and Manuscript Editing Before Submission",
     metaDescription: "Prepare your research article for journal submission with human editing for clarity, structure, grammar, formatting, and reviewer readability.",
     keywords: ["journal paper editing", "journal manuscript editing", "research article editing", "paper editing service"],
     audience: "Researchers and academics preparing articles, reviews, case reports, or short communications for journal submission.",
@@ -246,6 +385,14 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
         heading: "Responsible editing support",
         body: "Editors do not guarantee acceptance or manipulate results. The service improves presentation and language quality so the editorial decision can focus on the research itself.",
       },
+      {
+        heading: "Target-journal requirements and revised submissions",
+        body: "Provide the current author instructions, reference style, word limits, figure requirements, reporting checklist, and reviewer or editor comments. Editing can improve the clarity of a revised manuscript and response text, but the author must decide how to address every scientific or editorial request.",
+      },
+      {
+        heading: "Journal language, formatting, and reviewer readability",
+        body: "The review can improve concise technical language, section transitions, terminology, abbreviations, captions, visible reference-style consistency, and the readability of the abstract, methods, results, and discussion. It does not assess research validity or guarantee that a journal will send the paper for review or accept it.",
+      },
     ],
     faqs: [
       ...academicFaqs,
@@ -263,6 +410,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     relatedPosts: [
       { label: "Journal Manuscript Editing Before Submission", href: "/blog/journal-manuscript-editing-submission" },
       { label: "Research Paper Grammar and Formatting Mistakes", href: "/blog/research-paper-grammar-formatting-mistakes" },
+      { label: "British vs American English", href: "/blog/british-vs-american-english-thesis-journal" },
     ],
   },
   {
@@ -416,6 +564,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     relatedPosts: [
       { label: "Dissertation Proofreading Checklist", href: "/blog/dissertation-proofreading-checklist" },
       { label: "Academic Proofreading Cost in 2026", href: "/blog/academic-proofreading-cost-2026" },
+      { label: "British vs American English", href: "/blog/british-vs-american-english-thesis-journal" },
     ],
   },
   {
@@ -467,6 +616,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     relatedPosts: [
       { label: "Thesis Editing vs Proofreading", href: "/blog/thesis-editing-vs-proofreading" },
       { label: "Journal Manuscript Editing", href: "/blog/journal-manuscript-editing-submission" },
+      { label: "British vs American English", href: "/blog/british-vs-american-english-thesis-journal" },
     ],
   },
 ];

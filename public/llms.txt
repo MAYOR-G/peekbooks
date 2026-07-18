@@ -1,17 +1,17 @@
-# Peekbooks
+# PeekBooks Editors
 > Professional editing, proofreading, and document formatting.
 
-Peekbooks Editing and Proofreading helps researchers, authors, and professionals refine documents with human editorial care, clean formatting, and confidential handling. 
+PeekBooks Editors helps researchers, authors, and professionals refine documents with human editorial care, clean formatting, and confidential handling.
 
 ## Main sections
 - [Home](https://www.peekbookeditors.com/): Professional editing and proofreading services.
-- [About](https://www.peekbookeditors.com/about): Meet our elite roster of native English editors from top universities.
+- [About](https://www.peekbookeditors.com/about): Learn about the editorial process, scope, and ethical boundaries.
 - [Services](https://www.peekbookeditors.com/services): Discover our core services, including editing, proofreading, formatting, and translation.
 - [Pricing](https://www.peekbookeditors.com/pricing): View pricing based on word count, service level, and turnaround time.
 - [Contact](https://www.peekbookeditors.com/contact): Get in touch with our support team for custom editorial needs.
 
-## Optional: Key facts
-- Guaranteed on-time delivery.
-- Every document undergoes a strict two-editor quality check (duplicate senior review).
-- 100% human editorial review; we do not use AI replacements for judgement about clarity or meaning.
+## Key facts
+- Delivery dates are confirmed from document length, scope, condition, and editor availability.
+- Editors review documents against the agreed scope and supplied instructions.
+- Human editorial judgement is used for clarity, consistency, tone, and meaning.
 - Formatting available for APA, MLA, Chicago, Harvard, OSCOLA, IEEE, and journal-specific guidelines.

@@ -2,7 +2,8 @@ import { cookies } from "next/headers";
 
 import { safeCompare } from "@/lib/security";
 
-export const ADMIN_COOKIE_NAME = "peekbook_admin";
+export const ADMIN_COOKIE_NAME =
+  process.env.NODE_ENV === "production" ? "__Host-peekbooks_admin" : "peekbooks_admin";
 
 export async function isAdminAuthenticated() {
   const cookieStore = await cookies();

@@ -66,13 +66,15 @@ export default async function BlogPostPage({ params }: Props) {
     "@type": "BlogPosting",
     "@id": `${PRODUCTION_SITE_URL}/blog/${post.slug}#article`,
     headline: post.title,
-    description: post.excerpt,
+    description: post.metaDescription || post.excerpt,
     datePublished: new Date(post.date).toISOString(),
     dateModified: new Date(post.updated).toISOString(),
     mainEntityOfPage: `${PRODUCTION_SITE_URL}/blog/${post.slug}`,
     author: {
-      "@type": "Person",
-      name: post.author
+      "@type": "Organization",
+      "@id": `${PRODUCTION_SITE_URL}/#organization`,
+      name: BRAND_NAME,
+      url: PRODUCTION_SITE_URL,
     },
     publisher: {
       "@type": "Organization",

@@ -16,7 +16,7 @@ export default function ContactPage() {
               Secure contact
             </span>
             <h1 className="font-serif text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-              Talk with Peekbooks
+              Talk with PeekBooks Editors
             </h1>
             <p className="max-w-xl text-base leading-8 text-muted-foreground">
               Send project questions, attachment-based enquiries, or payment follow-up notes. Messages are stored in a private admin inbox so replies stay in one conversation.

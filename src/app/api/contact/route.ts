@@ -9,7 +9,7 @@ import {
   saveMessageThread,
 } from "@/lib/contact-store";
 import type { MessageThread } from "@/lib/contact-types";
-import { validateSupportedDocument } from "@/lib/file-validation";
+import { validateDocumentContent, validateSupportedDocument } from "@/lib/file-validation";
 import { sendContactReceivedNotifications } from "@/lib/notifications";
 import {
   PublicError,
@@ -66,11 +66,13 @@ export async function POST(request: Request) {
 
     if (file instanceof File && file.size > 0) {
       validateSupportedDocument(file.name, file.size);
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const mimeType = validateDocumentContent(file.name, buffer);
       attachment = await persistContactUpload({
         threadId,
         fileName: file.name,
-        buffer: Buffer.from(await file.arrayBuffer()),
-        mimeType: file.type || "application/octet-stream",
+        buffer,
+        mimeType,
       });
     }
 
@@ -112,7 +114,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ok: true,
-      message: "Thanks. Your message has been received by Peekbooks.",
+      message: "Thanks. Your message has been received by PeekBooks Editors.",
     });
   } catch (error) {
     return jsonError(error, "We could not send your message right now.");

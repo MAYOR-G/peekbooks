@@ -127,7 +127,7 @@ export default function AdditionalServicesPage() {
                                 <div className="aspect-square md:aspect-[4/3] flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200 p-8">
                                     <Clock className="w-24 h-24 text-orange-500/50 mb-6" strokeWidth={1} />
                                     <h3 className="text-2xl font-bold text-slate-700 mb-2">Beat the Deadline</h3>
-                                    <p className="text-slate-500 text-center max-w-xs">We guarantee return times within 7 days for critical documents.</p>
+                                    <p className="text-slate-500 text-center max-w-xs">Expedited schedules are confirmed from document length, scope, condition, and editor availability.</p>
                                 </div>
                             </motion.div>
                         </div>
@@ -264,10 +264,10 @@ export default function AdditionalServicesPage() {
                             className="max-w-2xl mx-auto"
                         >
                             <h2 className="text-3xl font-serif font-bold text-white mb-6">
-                                Ready for Publication?
+                                Prepare Your Document
                             </h2>
                             <p className="text-slate-200 mb-8 text-lg">
-                                Join thousands of happy researchers and professionals globally who trust our services.
+                                Choose the service and turnaround that match your document, then submit one current file with clear instructions.
                             </p>
                             <Button size="lg" className="bg-white text-primary hover:bg-slate-100 min-w-[200px]" asChild>
                                 <Link href="/submit">Submit Your Manuscript</Link>

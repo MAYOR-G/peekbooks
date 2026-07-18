@@ -20,9 +20,7 @@ type VerificationState =
       status: "success";
       payload: {
         submission: {
-          customerName: string;
           wordCount: number;
-          fileName: string;
           amount: number;
           currency: string;
         };
@@ -44,19 +42,17 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
     setState({ status: "loading" });
 
     try {
-      const response = await fetch(
-        `/api/submissions/verify?reference=${encodeURIComponent(paymentReference)}`,
-        {
-          cache: "no-store",
-        },
-      );
+      const response = await fetch("/api/submissions/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference: paymentReference }),
+        cache: "no-store",
+      });
 
       const payload = (await response.json()) as
         | {
             submission: {
-              customerName: string;
               wordCount: number;
-              fileName: string;
               amount: number;
               currency: string;
             };
@@ -193,8 +189,7 @@ export function SubmitComplete({ reference }: { reference: string | null }) {
             </div>
 
             <div className="grid w-full gap-4 rounded-[24px] border border-border/70 bg-secondary/40 p-5 text-left sm:grid-cols-2 sm:p-6">
-              <Summary label="Customer" value={state.payload.submission.customerName} />
-              <Summary label="Manuscript" value={state.payload.submission.fileName} />
+              <Summary label="Status" value="Payment reference confirmed" />
               <Summary
                 label="Detected word count"
                 value={`${state.payload.submission.wordCount.toLocaleString()} words`}

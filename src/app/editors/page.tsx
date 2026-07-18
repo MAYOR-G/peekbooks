@@ -52,9 +52,9 @@ const STANDARDS = [
   },
   {
     icon: ShieldCheck,
-    title: "Two-editor quality control",
+    title: "Document-level quality review",
     description:
-      "Primary editorial review is reinforced by a second quality-focused pass for consistency and accuracy.",
+      "Each document is reviewed against the agreed scope, language preferences, and supplied instructions before delivery.",
   },
 ];
 
@@ -62,7 +62,7 @@ const PROCESS = [
   "Manuscripts are reviewed for subject fit before assignment.",
   "Editors are selected for strong academic or technical writing backgrounds.",
   "Tracked changes are maintained for transparency and author control.",
-  "Quality review is part of the process, not an optional extra.",
+  "The completed document is checked against the agreed editorial scope before delivery.",
 ];
 
 export default function EditorsPage() {
@@ -90,7 +90,7 @@ export default function EditorsPage() {
                   Meet the standards behind our editing.
                 </h1>
                 <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-                  PEEKBOOKS works with seasoned academic and professional editors selected for subject familiarity, editorial judgement, and a process built around transparency.
+                  PeekBooks Editors works with academic and professional editors selected for subject familiarity, editorial judgement, and a process built around transparency.
                 </p>
               </motion.div>
 

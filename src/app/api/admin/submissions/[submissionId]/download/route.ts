@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { readSubmission, readSubmissionFile } from "@/lib/submission-store";
-import { PublicError, jsonError } from "@/lib/security";
+import { PublicError, attachmentContentDisposition, jsonError } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -22,7 +22,7 @@ export async function GET(
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": record.manuscript.mimeType || "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${record.manuscript.originalFileName.replaceAll('"', "")}"`,
+        "Content-Disposition": attachmentContentDisposition(record.manuscript.originalFileName),
       },
     });
   } catch (error) {

@@ -17,7 +17,9 @@ import {
   PublicError,
   assertRateLimit,
   getClientIp,
+  hashOpaqueToken,
   jsonError,
+  safeCompare,
   sanitizeText,
   verifyTurnstileToken,
 } from "@/lib/security";
@@ -32,6 +34,7 @@ export async function POST(request: Request) {
 
     const payload = (await request.json()) as {
       submissionId?: string;
+      draftToken?: string;
       fullName?: string;
       email?: string;
       institution?: string;
@@ -60,6 +63,19 @@ export async function POST(request: Request) {
 
     const validated = validateSubmissionPayload(payload);
     const record = await readSubmission(validated.submissionId);
+
+    if (
+      !record.draftAccessTokenHash ||
+      !safeCompare(hashOpaqueToken(validated.draftToken), record.draftAccessTokenHash)
+    ) {
+      throw new PublicError("This manuscript draft is not authorized for this session.", 403);
+    }
+
+    if (record.stage !== "draft" || record.paymentStatus !== "unpaid" || record.payment) {
+      throw new PublicError("This manuscript submission has already been finalized or sent to payment.", 409);
+    }
+
+    record.draftAccessTokenHash = null;
     const finalWordCount = validated.finalWordCount;
     const quote = calculateMultiServiceQuote({
       wordCount: finalWordCount,
@@ -185,6 +201,7 @@ export async function POST(request: Request) {
 
 function validateSubmissionPayload(payload: {
   submissionId?: string;
+  draftToken?: string;
   fullName?: string;
   email?: string;
   institution?: string;
@@ -204,6 +221,10 @@ function validateSubmissionPayload(payload: {
 }) {
   if (!payload.submissionId) {
     throw new Error("Missing manuscript submission id.");
+  }
+
+  if (!payload.draftToken || !/^[a-f0-9]{64}$/i.test(payload.draftToken)) {
+    throw new PublicError("This manuscript draft is missing its secure session token.", 403);
   }
 
   if (!payload.fullName?.trim()) {
@@ -277,6 +298,7 @@ function validateSubmissionPayload(payload: {
 
   return {
     submissionId: payload.submissionId,
+    draftToken: payload.draftToken,
     fullName: sanitizeText(payload.fullName, 120),
     email: payload.email.trim().toLowerCase(),
     institution: sanitizeText(payload.institution ?? "", 160),

@@ -5,7 +5,7 @@ import {
   saveSubmission,
   submissionExists,
 } from "@/lib/submission-store";
-import { verifyPaystackTransaction } from "@/lib/paystack";
+import { getPaystackCurrency, verifyPaystackTransaction } from "@/lib/paystack";
 import type { SubmissionRecord } from "@/lib/submission-types";
 
 export async function finalizeSubmissionFromReference(reference: string) {
@@ -28,6 +28,21 @@ export async function finalizeSubmissionFromReference(reference: string) {
 
   if (!record.brief || !record.pricing || !record.payment) {
     throw new Error("Submission record is incomplete.");
+  }
+
+  if (
+    verification.reference !== reference ||
+    record.payment.reference !== reference
+  ) {
+    throw new Error("Payment reference does not match the manuscript submission.");
+  }
+
+  const expectedCurrency = getPaystackCurrency();
+  if (
+    verification.currency.toUpperCase() !== expectedCurrency ||
+    record.pricing.currency.toUpperCase() !== expectedCurrency
+  ) {
+    throw new Error("Verified payment currency does not match the manuscript quote.");
   }
 
   const expectedQuote = calculateMultiServiceQuote({

@@ -42,7 +42,7 @@ export function AdminLogin() {
             <LockKeyhole className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-serif text-2xl font-semibold">Peekbooks Admin</h1>
+            <h1 className="font-serif text-2xl font-semibold">PeekBooks Editors Admin</h1>
             <p className="text-sm text-muted-foreground">Protected editorial dashboard</p>
           </div>
         </div>

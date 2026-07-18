@@ -1,9 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Footer } from "@/components/layouts/footer";
 import { Navbar } from "@/components/layouts/navbar";
 import { Container } from "@/components/layouts/container";
 import { Button } from "@/components/ui/button";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Page Not Found",
+  description: "The requested PeekBooks Editors page could not be found.",
+  canonicalPath: null,
+  noindex: true,
+});
 
 export default function NotFound() {
   return (

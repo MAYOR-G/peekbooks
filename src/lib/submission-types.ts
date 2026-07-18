@@ -11,6 +11,7 @@ export type NotificationState = "pending" | "sent" | "failed";
 
 export interface SubmissionRecord {
   id: string;
+  draftAccessTokenHash: string | null;
   createdAt: string;
   updatedAt: string;
   stage: SubmissionStage;

@@ -54,7 +54,7 @@ export function ContactForm() {
           <Mail className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-serif text-2xl font-semibold text-foreground">Contact Peekbooks</h3>
+          <h3 className="font-serif text-2xl font-semibold text-foreground">Contact PeekBooks Editors</h3>
           <p className="text-sm text-muted-foreground">Send a message or attach a document for review.</p>
         </div>
       </div>

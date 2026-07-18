@@ -1,4 +1,5 @@
 import { NEW_LEARNING_CENTER_POSTS } from "@/lib/new-learning-center-posts";
+import { SEO_OPPORTUNITY_POSTS } from "@/lib/seo-opportunity-posts";
 
 export interface BlogPost {
   slug: string;
@@ -22,6 +23,7 @@ const author = "PeekBooks Editorial Team";
 const updated2026 = "2026-06-25";
 
 export const BLOG_POSTS: BlogPost[] = [
+  ...SEO_OPPORTUNITY_POSTS,
   ...NEW_LEARNING_CENTER_POSTS,
   {
     slug: "dissertation-proofreading-checklist",
@@ -165,6 +167,16 @@ export const BLOG_POSTS: BlogPost[] = [
         </tbody>
       </table>
 
+      <h2>Choose the service from the condition of your draft</h2>
+      <table>
+        <thead><tr><th>Document condition</th><th>Recommended service</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>The argument is established, but sentences are awkward, repetitive, or difficult to follow.</td><td><a href="/thesis-editing">Thesis editing</a></td><td>Clarity, flow, tone, transitions, and wording still need active revision.</td></tr>
+          <tr><td>The wording is stable and supervisor revisions are complete, but surface errors remain.</td><td><a href="/thesis-proofreading">Thesis proofreading</a></td><td>The document needs a final grammar, punctuation, consistency, and presentation check.</td></tr>
+          <tr><td>Both deeper language work and a final check are needed.</td><td>Editing, author review, then proofreading</td><td>Separating the stages prevents later revisions from reintroducing errors.</td></tr>
+        </tbody>
+      </table>
+
       <h2>When thesis editing is the better choice</h2>
       <p>Choose editing when readers may struggle to follow your argument. Editing can reduce wordiness, clarify transitions, smooth paragraph flow, and make academic phrasing more natural without changing your findings.</p>
       <p>Editing is also useful after supervisor comments. If you have revised chapters quickly, the new material may not match the tone, tense, or terminology of earlier sections.</p>
@@ -268,6 +280,19 @@ export const BLOG_POSTS: BlogPost[] = [
       <h2>Turnaround time and rush fees</h2>
       <p>Short deadlines cost more because the editor must reserve focused time quickly. If your submission date is flexible, choose a longer turnaround. You will usually get better scheduling options and a calmer review process.</p>
 
+      <h2>How much does PhD thesis proofreading cost?</h2>
+      <p>A PhD thesis should be estimated from the actual file and requested scope rather than from a generic market range. Two theses with the same word count can require very different amounts of work. Use the current <a href="/pricing">pricing estimator</a> for a preliminary calculation, then provide the document and instructions so the scope can be confirmed.</p>
+      <table>
+        <thead><tr><th>Thesis factor</th><th>Why it affects the estimate</th><th>What to provide</th></tr></thead>
+        <tbody>
+          <tr><td>Final word count</td><td>It defines the volume of text under review.</td><td>The count for the sections you want included.</td></tr>
+          <tr><td>Service depth</td><td>Editing clarity and flow is more intensive than final proofreading.</td><td>A note about whether wording is already stable.</td></tr>
+          <tr><td>Turnaround</td><td>Short deadlines require protected editorial capacity.</td><td>The official deadline, time zone, and author-review buffer.</td></tr>
+          <tr><td>References and formatting</td><td>Tables, figures, cross-references, style rules, and appendices add checks.</td><td>The university guide and required citation style.</td></tr>
+          <tr><td>File condition</td><td>Version conflicts, unresolved comments, or corrupted formatting add uncertainty.</td><td>One current, stable DOCX file where possible.</td></tr>
+        </tbody>
+      </table>
+
       <h2>Proofreading vs editing cost</h2>
       <p>Proofreading is narrower than editing, so it is usually less expensive. If your paper needs sentence restructuring, clarity work, or paragraph flow improvement, choose <a href="/academic-editing">academic editing</a> instead of trying to force a proofreading service to do editing work.</p>
 
@@ -345,6 +370,20 @@ export const BLOG_POSTS: BlogPost[] = [
       <h2>After editing</h2>
       <p>Review tracked changes carefully. Accept revisions you agree with, answer editor comments, check final figures, and proofread the final file before upload. For final help, use <a href="/manuscript-editing">manuscript editing</a> or <a href="/submit">submit your manuscript</a>.</p>
 
+      <h2>Can you edit a manuscript after submission?</h2>
+      <p>Sometimes, but the permitted action depends on the journal stage. Do not upload an unrequested replacement file or email a revised manuscript without checking the journal's current instructions and the handling editor's direction.</p>
+      <table>
+        <thead><tr><th>Submission stage</th><th>What may be possible</th><th>What to do first</th></tr></thead>
+        <tbody>
+          <tr><td>Before editorial screening</td><td>The system may allow withdrawal or a replacement, but many systems lock the files immediately.</td><td>Check the submission portal and contact the editorial office if the correction is material.</td></tr>
+          <tr><td>Waiting for peer review</td><td>Minor language edits are usually not a reason to interrupt review; a serious factual error may need prompt disclosure.</td><td>Ask the handling editor rather than sending a silent revision.</td></tr>
+          <tr><td>Revise and resubmit</td><td>This is the normal opportunity to edit the manuscript and respond to reviewer comments.</td><td>Follow the decision letter, preserve a response record, and comply with file-marking rules.</td></tr>
+          <tr><td>Accepted manuscript</td><td>Only limited author corrections may be appropriate before production.</td><td>Follow the publisher's acceptance and production instructions.</td></tr>
+          <tr><td>Proof stage</td><td>Corrections are generally for production errors and essential fixes, not substantial rewriting.</td><td>Use the proofing system and meet its deadline exactly.</td></tr>
+        </tbody>
+      </table>
+      <p>Journal policies differ, so the target journal's author instructions and direct editorial correspondence take priority. If you receive a revision decision, <a href="/journal-paper-editing">journal paper editing</a> can support clarity and consistency while you remain responsible for the scientific response.</p>
+
       <h2>What editing cannot do</h2>
       <p>Editing can make your paper clearer, but it cannot fix weak evidence, missing ethics approval, unsuitable journal fit, or unsupported conclusions. Those decisions belong to the author team. A careful editor can flag unclear claims, but they should not invent data or reshape the study beyond the agreed language scope.</p>
     `,
@@ -415,7 +454,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <p>Review the paper in passes. First read for structure, then grammar, then references, then tables and figures. Changing focus reduces fatigue and makes errors easier to see.</p>
 
       <h2>When to use a professional editor</h2>
-      <p>If your paper has been revised multiple times, written by several co-authors, or translated into English, professional editing can unify tone, terminology, and flow. Start with <a href="/pricing">pricing</a> or <a href="/submit">submit your document</a>.</p>
+      <p>If your paper has been revised multiple times, written by several co-authors, or translated into English, professional editing can unify tone, terminology, and flow. Compare <a href="/manuscript-editing">manuscript editing</a>, start with <a href="/pricing">pricing</a>, or <a href="/submit">submit your document</a>.</p>
 
       <h2>A practical final pass</h2>
       <p>Print the paper or export it to PDF for one final read. Layout issues are easier to spot when the document looks close to the version reviewers will see. Then return to the editable file and fix the issues carefully, one at a time.</p>
@@ -621,7 +660,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </table>
 
       <h2>Next step</h2>
-      <p>For academic work, compare <a href="/academic-proofreading-cost-2026">academic proofreading cost</a>. For service-specific help, explore <a href="/dissertation-proofreading">dissertation proofreading</a> or <a href="/business-document-editing">business document editing</a>.</p>
+      <p>For academic work, compare <a href="/blog/academic-proofreading-cost-2026">academic proofreading cost</a>. For service-specific help, explore <a href="/dissertation-proofreading">dissertation proofreading</a> or <a href="/business-document-editing">business document editing</a>.</p>
     `,
   },
 ];

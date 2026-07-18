@@ -3,7 +3,7 @@ import { buildPageMetadata } from "@/lib/seo";
 export const metadata = buildPageMetadata({
   title: "Admin",
   description: "Private administration area.",
-  canonicalPath: "/admin",
+  canonicalPath: null,
   noindex: true,
 });
 

@@ -4,7 +4,7 @@ import { BRAND_NAME, PRODUCTION_SITE_URL, SITE_CONTACT } from "./site";
 interface PageSEOProps {
   title: string;
   description: string;
-  canonicalPath?: string;
+  canonicalPath?: string | null;
   keywords?: string[];
   openGraph?: {
     images?: Array<{ url: string; width: number; height: number; alt: string }>;
@@ -19,7 +19,6 @@ export function buildPageMetadata({
   title,
   description,
   canonicalPath,
-  keywords,
   openGraph,
   noindex = false,
 }: PageSEOProps): Metadata {
@@ -42,10 +41,7 @@ export function buildPageMetadata({
       template: `%s | ${BRAND_NAME}`,
     },
     description,
-    keywords,
-    alternates: {
-      canonical: url,
-    },
+    alternates: canonicalPath === null ? undefined : { canonical: url },
     robots: {
       index: !noindex,
       follow: !noindex,
@@ -92,13 +88,8 @@ export function generateOrganizationSchema() {
     "@type": "Organization",
     "@id": `${PRODUCTION_SITE_URL}/#organization`,
     name: BRAND_NAME,
-    legalName: "Peekbooks Editing and Proofreading",
     url: PRODUCTION_SITE_URL,
     logo: `${PRODUCTION_SITE_URL}/icon.svg`,
-    sameAs: [
-      SITE_CONTACT.socials.twitter,
-      SITE_CONTACT.socials.linkedin,
-    ],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+44 7305 605459",
@@ -161,20 +152,20 @@ export function generateProfessionalServiceSchema() {
         "@type": "Review",
         author: { "@type": "Person", name: "Mary Jane" },
         reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-        reviewBody: "I am very pleased providing my thesis to Peekbooks. They fixed all the awkward phrasing and made my research shine."
+        reviewBody: "I am very pleased providing my thesis to PeekBooks Editors. They fixed all the awkward phrasing and made my research shine.",
       },
       {
         "@type": "Review",
         author: { "@type": "Person", name: "Prof. Patel" },
         reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-        reviewBody: "The language review made our submission clearer and easier to follow. The editor’s comments were specific, practical, and respectful of the research."
+        reviewBody: "The language review made our submission clearer and easier to follow. The editor’s comments were specific, practical, and respectful of the research.",
       },
       {
         "@type": "Review",
         author: { "@type": "Person", name: "Dr. L. Smith" },
         reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-        reviewBody: "The team at Peekbooks is exceptional. Their two-editor quality check discovered nuances I missed in my own data."
-      }
+        reviewBody: "The team at PeekBooks Editors is exceptional. Their two-editor quality check discovered nuances I missed in my own data.",
+      },
     ],
     hasOfferCatalog: {
       "@type": "OfferCatalog",

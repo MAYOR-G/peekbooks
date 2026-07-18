@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { addReplyToThread, createReplyId, persistContactUpload } from "@/lib/contact-store";
-import { validateSupportedDocument } from "@/lib/file-validation";
+import { validateDocumentContent, validateSupportedDocument } from "@/lib/file-validation";
 import { sendAdminReplyEmail } from "@/lib/notifications";
 import { PublicError, jsonError, sanitizeText } from "@/lib/security";
 
@@ -30,11 +30,13 @@ export async function POST(
 
     if (file instanceof File && file.size > 0) {
       validateSupportedDocument(file.name, file.size);
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const mimeType = validateDocumentContent(file.name, buffer);
       attachment = await persistContactUpload({
         threadId,
         fileName: file.name,
-        buffer: Buffer.from(await file.arrayBuffer()),
-        mimeType: file.type || "application/octet-stream",
+        buffer,
+        mimeType,
         purpose: "completed",
       });
     }
@@ -43,7 +45,7 @@ export async function POST(
       id: createReplyId(),
       createdAt: new Date().toISOString(),
       direction: "admin" as const,
-      senderName: "Peekbooks Editing and Proofreading",
+      senderName: "PeekBooks Editors",
       senderEmail: process.env.EDITOR_NOTIFICATION_EMAIL ?? "admin@peekbookeditors.com",
       message,
       attachment,
