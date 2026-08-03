@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const hasTurnstileSiteKey = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 const hasTurnstileSecret = Boolean(process.env.TURNSTILE_SECRET_KEY);
@@ -13,7 +17,7 @@ if (process.env.NODE_ENV === "production" && (!hasTurnstileSiteKey || !hasTurnst
 
 if (process.env.NODE_ENV === "production" && publicCurrency !== paystackCurrency) {
   throw new Error(
-    "Payment currency configuration is inconsistent: NEXT_PUBLIC_SITE_CURRENCY and PAYSTACK_CURRENCY must match.",
+    `Payment currency configuration is inconsistent: NEXT_PUBLIC_SITE_CURRENCY resolves to ${publicCurrency}, but PAYSTACK_CURRENCY resolves to ${paystackCurrency}. These values must match.`,
   );
 }
 
@@ -34,6 +38,9 @@ const contentSecurityPolicyReportOnly = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  turbopack: {
+    root: projectRoot,
+  },
   images: {
     remotePatterns: [
       {
