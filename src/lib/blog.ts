@@ -1,5 +1,6 @@
 import { NEW_LEARNING_CENTER_POSTS } from "@/lib/new-learning-center-posts";
 import { SEO_OPPORTUNITY_POSTS } from "@/lib/seo-opportunity-posts";
+import { STRATEGIC_SEO_POSTS } from "@/lib/strategic-seo-posts";
 
 export interface BlogPost {
   slug: string;
@@ -13,6 +14,7 @@ export interface BlogPost {
   updated: string;
   readTime: string;
   tags: string[];
+  category?: string;
   summary?: string[];
   faqs?: { question: string; answer: string }[];
   heroImage?: string;
@@ -23,6 +25,7 @@ const author = "PeekBooks Editorial Team";
 const updated2026 = "2026-06-25";
 
 export const BLOG_POSTS: BlogPost[] = [
+  ...STRATEGIC_SEO_POSTS,
   ...SEO_OPPORTUNITY_POSTS,
   ...NEW_LEARNING_CENTER_POSTS,
   {
@@ -116,8 +119,9 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: "thesis-editing-vs-proofreading",
-    title: "Thesis Editing vs Thesis Proofreading: What Do You Need?",
+    title: "Thesis Editing vs Proofreading: Which Service Do You Need?",
     seoTitle: "Thesis Editing vs Proofreading: Which Service Do You Need?",
+    metaDescription: "Compare thesis editing and proofreading by draft readiness, editing depth, supervisor comments, final-stage errors, decision tables and service timing.",
     excerpt: "Learn the difference between thesis editing and thesis proofreading, when to choose each service, and how to avoid paying for the wrong level of review.",
     author,
     date: "2026-02-04",
@@ -211,7 +215,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "academic-proofreading-cost-2026",
     title: "How Much Does Academic Proofreading Cost in 2026?",
-    seoTitle: "Academic Proofreading Cost in 2026: What to Expect",
+    seoTitle: "Academic Proofreading Cost in 2026: Thesis, Dissertation and Paper Pricing",
     excerpt: "A practical 2026 guide to academic proofreading costs, pricing models, turnaround fees, document complexity, and how to budget for human editing.",
     author,
     date: "2026-02-22",
@@ -598,8 +602,9 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: "how-much-does-proofreading-cost",
-    title: "How Much Does Proofreading Cost in 2026?",
-    seoTitle: "How Much Does Proofreading Cost in 2026?",
+    title: "How Much Does Professional Proofreading Cost in 2026?",
+    seoTitle: "How Much Does Proofreading Cost in 2026? Rates and Pricing",
+    metaDescription: "See how much proofreading costs in 2026 for business documents, CVs, author manuscripts, reports and professional writing, with pricing models and quote tips.",
     excerpt: "Updated 2026 guide to proofreading prices, per-word rates, turnaround fees, document complexity, and how to compare quotes fairly.",
     author,
     date: "2026-01-21",
@@ -635,13 +640,23 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
     content: `
-      <p>Proofreading cost in 2026 depends on the word count, turnaround, document type, language condition, and whether formatting or specialist style checks are required. The simplest way to estimate your project is to use the <a href="/pricing">pricing calculator</a>.</p>
-      <p>Per-word pricing is often the clearest model because a page can contain very different word counts depending on layout. A 20-page double-spaced essay and a 20-page report with tables are not the same workload.</p>
+      <p>Proofreading cost in 2026 depends on the word count, turnaround, document type, language condition, and whether formatting or specialist style checks are required. This guide covers general professional proofreading for business documents, CVs, resumes, reports, author manuscripts, website copy, proposals, and other non-specialist documents. The simplest way to estimate your project is to use the <a href="/pricing">pricing calculator</a>.</p>
+      <p>Per-word pricing is often the clearest model because a page can contain very different word counts depending on layout. A 20-page business report with charts, a 20-page CV portfolio, and a 20-page author manuscript can all require different levels of checking.</p>
 
       <blockquote>Quick answer: proofreading is priced by the amount of text and the pressure around it. More words, tighter deadlines, heavy formatting, and messy references usually increase the cost.</blockquote>
 
       <h2>What affects proofreading price?</h2>
       <p>The biggest factors are word count, deadline, complexity, and document readiness. A clean business letter with a flexible deadline is easier to review than a technical thesis with inconsistent references and a same-day deadline.</p>
+
+      <h2>Common professional document examples</h2>
+      <table>
+        <thead><tr><th>Document type</th><th>Typical cost factor</th><th>Useful service link</th></tr></thead>
+        <tbody>
+          <tr><td>Business report or proposal</td><td>Figures, tables, version control, and client terminology.</td><td><a href="/business-document-editing">Business document editing</a></td></tr>
+          <tr><td>CV, resume, or cover letter</td><td>Dates, job titles, formatting, and role-specific wording.</td><td><a href="/cv-editing-service">CV editing service</a></td></tr>
+          <tr><td>Author manuscript</td><td>Length, style consistency, and whether editing is needed before proofreading.</td><td><a href="/manuscript-editing">Manuscript editing</a></td></tr>
+        </tbody>
+      </table>
 
       <h2>Proofreading vs editing prices</h2>
       <p>Proofreading costs less because it checks final errors. Editing costs more because it improves sentence clarity, flow, structure, tone, and readability. If the document still feels rough, paying for proofreading alone may not solve the real problem.</p>
@@ -660,15 +675,84 @@ export const BLOG_POSTS: BlogPost[] = [
       </table>
 
       <h2>Next step</h2>
-      <p>For academic work, compare <a href="/blog/academic-proofreading-cost-2026">academic proofreading cost</a>. For service-specific help, explore <a href="/dissertation-proofreading">dissertation proofreading</a> or <a href="/business-document-editing">business document editing</a>.</p>
+      <p>For thesis, dissertation, essay, or journal-paper pricing factors, read the dedicated <a href="/blog/academic-proofreading-cost-2026">academic proofreading cost guide</a>. For general professional documents, use the <a href="/pricing">pricing calculator</a> or <a href="/submit">submit your document</a> for scope confirmation.</p>
     `,
   },
 ];
 
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
-  return BLOG_POSTS;
+  return [...BLOG_POSTS].sort((a, b) => {
+    const byDate = new Date(b.date).getTime() - new Date(a.date).getTime();
+    return byDate || a.title.localeCompare(b.title);
+  });
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
   return BLOG_POSTS.find((post) => post.slug === slug);
+}
+
+export const BLOG_POSTS_PER_PAGE = 12;
+
+const CATEGORY_BY_SLUG: Record<string, string> = {
+  "phd-thesis-proofreading-checklist": "Thesis and Dissertation",
+  "how-to-review-tracked-changes-in-word": "Formatting and References",
+  "cv-proofreading-checklist": "Careers and CVs",
+  "business-report-proofreading-checklist": "Business Writing",
+  "journal-cover-letter-checklist": "Research and Journals",
+  "apa-7-reference-list-checklist": "Formatting and References",
+  "human-vs-ai-proofreading-academic-research": "AI and Writing Tools",
+  "academic-english-editing-non-native-speakers": "Academic Editing",
+  "prepare-manuscript-for-editing": "Authors and Manuscripts",
+  "manuscript-editing-vs-proofreading-authors": "Authors and Manuscripts",
+  "proofread-tables-and-figures-research-paper": "Research and Journals",
+  "how-long-does-thesis-proofreading-take": "Thesis and Dissertation",
+  "british-vs-american-english-thesis-journal": "Academic Editing",
+  "how-to-choose-research-philosophy-for-thesis": "Thesis and Dissertation",
+  "editing-and-proofreading-before-manuscript-submission": "Authors and Manuscripts",
+  "dissertation-proofreading-checklist": "Thesis and Dissertation",
+  "thesis-editing-vs-proofreading": "Thesis and Dissertation",
+  "academic-proofreading-cost-2026": "Academic Editing",
+  "journal-manuscript-editing-submission": "Research and Journals",
+  "research-paper-grammar-formatting-mistakes": "Research and Journals",
+  "professional-editing-clarity-structure-readability": "Academic Editing",
+  "editing-vs-proofreading": "Academic Editing",
+  "how-much-does-proofreading-cost": "Business Writing",
+};
+
+export function getPostCategory(post: BlogPost): string {
+  return post.category || CATEGORY_BY_SLUG[post.slug] || "Academic Editing";
+}
+
+export function getBlogPageCount(posts: BlogPost[]): number {
+  return Math.max(1, Math.ceil(posts.length / BLOG_POSTS_PER_PAGE));
+}
+
+export function paginateBlogPosts(posts: BlogPost[], page: number): BlogPost[] {
+  const start = (page - 1) * BLOG_POSTS_PER_PAGE;
+  return posts.slice(start, start + BLOG_POSTS_PER_PAGE);
+}
+
+export function categoryToSlug(category: string): string {
+  return category
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function getBlogCategories(posts: BlogPost[]) {
+  const categories = new Map<string, BlogPost[]>();
+  for (const post of posts) {
+    const category = getPostCategory(post);
+    categories.set(category, [...(categories.get(category) || []), post]);
+  }
+
+  return [...categories.entries()]
+    .filter(([, categoryPosts]) => categoryPosts.length > 0)
+    .map(([name, categoryPosts]) => ({
+      name,
+      slug: categoryToSlug(name),
+      posts: categoryPosts,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }

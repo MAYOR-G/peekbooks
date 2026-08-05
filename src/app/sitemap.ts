@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { PRODUCTION_SITE_URL } from "@/lib/site";
-import { getAllBlogPosts } from "@/lib/blog";
+import { getAllBlogPosts, getBlogCategories, getBlogPageCount } from "@/lib/blog";
 import { SEO_LANDING_PAGES } from "@/lib/seo-landing-pages";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -18,6 +18,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const posts = await getAllBlogPosts();
+  const blogPageCount = getBlogPageCount(posts);
+  const blogPaginationRoutes = Array.from({ length: Math.max(0, blogPageCount - 1) }, (_, index) => ({
+    url: `${PRODUCTION_SITE_URL}/blog/page/${index + 2}`,
+  }));
+  const categoryRoutes = getBlogCategories(posts).flatMap((category) => {
+    const categoryPageCount = getBlogPageCount(category.posts);
+    return [
+      { url: `${PRODUCTION_SITE_URL}/blog/category/${category.slug}` },
+      ...Array.from({ length: Math.max(0, categoryPageCount - 1) }, (_, index) => ({
+        url: `${PRODUCTION_SITE_URL}/blog/category/${category.slug}/page/${index + 2}`,
+      })),
+    ];
+  });
   const blogRoutes = posts.map((post) => ({
     url: `${PRODUCTION_SITE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.updated).toISOString().split("T")[0],
@@ -27,5 +40,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${PRODUCTION_SITE_URL}/${page.slug}`,
   }));
 
-  return [...routes, ...serviceRoutes, ...seoLandingRoutes, ...blogRoutes];
+  return [...routes, ...serviceRoutes, ...seoLandingRoutes, ...blogPaginationRoutes, ...categoryRoutes, ...blogRoutes];
 }

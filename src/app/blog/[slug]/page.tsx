@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 
-import { getBlogPostBySlug, getAllBlogPosts } from "@/lib/blog";
+import { getBlogPostBySlug, getAllBlogPosts, getPostCategory } from "@/lib/blog";
 import { buildPageMetadata, generateBreadcrumbSchema, generateFAQSchema } from "@/lib/seo";
 import { BRAND_NAME, PRODUCTION_SITE_URL } from "@/lib/site";
 import { Navbar } from "@/components/layouts/navbar";
@@ -78,12 +78,14 @@ export default async function BlogPostPage({ params }: Props) {
     },
     publisher: {
       "@type": "Organization",
+      "@id": `${PRODUCTION_SITE_URL}/#organization`,
       name: BRAND_NAME,
       logo: {
         "@type": "ImageObject",
         url: `${PRODUCTION_SITE_URL}/icon.svg`,
       },
     },
+    articleSection: getPostCategory(post),
     image: post.heroImage ? {
       "@type": "ImageObject",
       url: `${PRODUCTION_SITE_URL}${post.heroImage}`,
